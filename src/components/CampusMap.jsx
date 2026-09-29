@@ -29,10 +29,207 @@ const TELKOM_BOUNDARY = [
 ];
 export const CAMPUS_PLACES = [
   { name: "Telkom University", position: [-6.9747, 107.6301], kind: "Campus" },
-  { name: "Telkom University Library", position: [-6.9729, 107.6294], kind: "Study space" },
+  { name: "Telkom University Library", position: [-6.97345, 107.6304], kind: "Study space" },
   { name: "Telkom University Landmark Tower (TULT)", position: [-6.968949, 107.628111], kind: "Building" },
   { name: "Student Center", position: [-6.9771, 107.6298], kind: "Student spot" },
+  { name: "Sport Center", position: [-6.97245, 107.6289], kind: "Sports" },
+  { name: "Tel-U Coffee", position: [-6.9735, 107.6305], kind: "Cafe" },
+  { name: "Asrama Putra", position: [-6.9718, 107.6288], kind: "Dormitory" },
+  { name: "Asrama Putri", position: [-6.9735, 107.6295], kind: "Dormitory" },
 ];
+
+/** Campus road and walkway network nodes [lat, lng] */
+const CAMPUS_GRAPH_NODES = {
+  // Asrama Putra internal roads
+  asrama_p_g5: [-6.9718, 107.6288],
+  asrama_p_west: [-6.9718, 107.6285],
+  asrama_p_g2: [-6.9718, 107.6291],
+  asrama_p_east: [-6.9718, 107.62935],
+  asrama_p_southwest: [-6.9722, 107.6285],
+  asrama_p_south: [-6.9722, 107.6288],
+  asrama_tj_mart: [-6.97218, 107.62935],
+
+  // Sport Center building
+  sport_center: [-6.97245, 107.6289],
+
+  // Road north of Sport Center & Parking Lot P
+  road_sport_center: [-6.97222, 107.6297],
+  road_park_n1: [-6.97226, 107.6301],
+  road_park_n2: [-6.97230, 107.6306],
+  road_park_n3: [-6.97235, 107.6310],
+  road_park_ne: [-6.97238, 107.6313],
+
+  // Road east of Parking Lot P along Danau Galau (the lake)
+  road_lake_1: [-6.97250, 107.63128],
+  road_lake_2: [-6.97275, 107.63110],
+  road_lake_3: [-6.97305, 107.63092],
+  road_lake_4: [-6.97330, 107.63085],
+  road_library_junc: [-6.97340, 107.63070],
+  library_entrance: [-6.97345, 107.63040],
+
+  // Central road / Asrama Putri / KU
+  road_asrama_putri: [-6.9735, 107.6295],
+  road_ku_west: [-6.97340, 107.6298],
+  road_ku_south: [-6.97380, 107.6301],
+
+  // Central boulevard towards Rektorat & Student Center
+  road_boulevard_n: [-6.9741, 107.6302],
+  telkom_univ: [-6.9747, 107.6301],
+  road_boulevard_s: [-6.9755, 107.6300],
+  road_student_center_junc: [-6.9765, 107.6299],
+  student_center: [-6.9771, 107.6298],
+
+  // North road towards TULT
+  road_north_gate: [-6.9708, 107.6283],
+  road_tult_approach: [-6.9698, 107.6282],
+  tult: [-6.968949, 107.628111],
+};
+
+/** Connected walkway segments across campus */
+const CAMPUS_GRAPH_EDGES = [
+  // Asrama Putra grid
+  ["asrama_p_west", "asrama_p_g5"],
+  ["asrama_p_g5", "asrama_p_g2"],
+  ["asrama_p_g2", "asrama_p_east"],
+  ["asrama_p_west", "asrama_p_southwest"],
+  ["asrama_p_g5", "asrama_p_south"],
+  ["asrama_p_east", "asrama_tj_mart"],
+  ["asrama_p_southwest", "asrama_p_south"],
+  ["asrama_p_south", "asrama_tj_mart"],
+
+  // Road past Sport Center & along north of Parking Lot P
+  ["sport_center", "asrama_tj_mart"],
+  ["sport_center", "road_sport_center"],
+  ["asrama_tj_mart", "road_sport_center"],
+  ["road_sport_center", "road_park_n1"],
+  ["road_park_n1", "road_park_n2"],
+  ["road_park_n2", "road_park_n3"],
+  ["road_park_n3", "road_park_ne"],
+
+  // Curve and road south along the lake to Library / Tel-U Coffee
+  ["road_park_ne", "road_lake_1"],
+  ["road_lake_1", "road_lake_2"],
+  ["road_lake_2", "road_lake_3"],
+  ["road_lake_3", "road_lake_4"],
+  ["road_lake_4", "road_library_junc"],
+  ["road_library_junc", "library_entrance"],
+
+  // Central links around KU & Asrama Putri
+  ["road_asrama_putri", "road_ku_west"],
+  ["road_ku_west", "library_entrance"],
+  ["library_entrance", "road_ku_south"],
+  ["road_library_junc", "road_ku_south"],
+  ["road_ku_south", "road_boulevard_n"],
+
+  // Boulevard to Rektorat & Student Center
+  ["road_boulevard_n", "telkom_univ"],
+  ["telkom_univ", "road_boulevard_s"],
+  ["road_boulevard_s", "road_student_center_junc"],
+  ["road_student_center_junc", "student_center"],
+
+  // North path to TULT
+  ["asrama_p_west", "road_north_gate"],
+  ["road_north_gate", "road_tult_approach"],
+  ["road_tult_approach", "tult"],
+];
+
+function distBetween([lat1, lng1], [lat2, lng2]) {
+  const dLat = lat1 - lat2;
+  const dLng = (lng1 - lng2) * Math.cos(((lat1 + lat2) / 2) * Math.PI / 180);
+  return Math.sqrt(dLat * dLat + dLng * dLng);
+}
+
+function findNearestNode(point) {
+  let nearest = null;
+  let minDist = Infinity;
+  for (const [id, coords] of Object.entries(CAMPUS_GRAPH_NODES)) {
+    const d = distBetween(point, coords);
+    if (d < minDist) {
+      minDist = d;
+      nearest = id;
+    }
+  }
+  return { id: nearest, dist: minDist };
+}
+
+function findCampusRoute(from, to) {
+  const start = findNearestNode(from);
+  const end = findNearestNode(to);
+  if (!start.id || !end.id) return null;
+  // If either point is too far from campus (> ~1.5 km), don't use campus graph
+  if (start.dist > 0.015 || end.dist > 0.015) return null;
+
+  // Adjacency list
+  const adj = {};
+  for (const id of Object.keys(CAMPUS_GRAPH_NODES)) {
+    adj[id] = [];
+  }
+  for (const [u, v] of CAMPUS_GRAPH_EDGES) {
+    if (CAMPUS_GRAPH_NODES[u] && CAMPUS_GRAPH_NODES[v]) {
+      const w = distBetween(CAMPUS_GRAPH_NODES[u], CAMPUS_GRAPH_NODES[v]);
+      adj[u].push({ node: v, weight: w });
+      adj[v].push({ node: u, weight: w });
+    }
+  }
+
+  // Dijkstra
+  const dist = {};
+  const prev = {};
+  const unvisited = new Set(Object.keys(CAMPUS_GRAPH_NODES));
+  for (const id of Object.keys(CAMPUS_GRAPH_NODES)) {
+    dist[id] = Infinity;
+  }
+  dist[start.id] = 0;
+
+  while (unvisited.size > 0) {
+    let curr = null;
+    let minD = Infinity;
+    for (const node of unvisited) {
+      if (dist[node] < minD) {
+        minD = dist[node];
+        curr = node;
+      }
+    }
+    if (curr === null || dist[curr] === Infinity || curr === end.id) break;
+    unvisited.delete(curr);
+
+    for (const edge of adj[curr]) {
+      if (unvisited.has(edge.node)) {
+        const alt = dist[curr] + edge.weight;
+        if (alt < dist[edge.node]) {
+          dist[edge.node] = alt;
+          prev[edge.node] = curr;
+        }
+      }
+    }
+  }
+
+  if (dist[end.id] === Infinity) return null;
+
+  // Reconstruct path
+  const path = [];
+  let u = end.id;
+  while (u) {
+    path.unshift(CAMPUS_GRAPH_NODES[u]);
+    u = prev[u];
+  }
+
+  // Assemble full path: from -> nodes -> to
+  const raw = [from, ...path, to];
+  // Deduplicate consecutive points that are extremely close
+  const cleaned = [];
+  for (let i = 0; i < raw.length; i++) {
+    if (cleaned.length === 0) {
+      cleaned.push(raw[i]);
+    } else {
+      const prevPt = cleaned[cleaned.length - 1];
+      if (distBetween(prevPt, raw[i]) > 0.00003) {
+        cleaned.push(raw[i]);
+      }
+    }
+  }
+  return cleaned;
+}
 
 /** Bearing in degrees from point A to B */
 function bearingTo([lat1, lng1], [lat2, lng2]) {
@@ -220,21 +417,26 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd },
 
           clearRoute();
 
-          // Try OSRM for walking route
-          let routeCoords;
-          try {
-            const url = `https://router.project-osrm.org/route/v1/foot/${from[1]},${from[0]};${to[1]},${to[0]}?overview=full&geometries=geojson`;
-            const res = await fetch(url);
-            const data = await res.json();
-            if (data.routes?.[0]) {
-              routeCoords = data.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
-            }
-          } catch { /* fallback to straight line */ }
+          // Calculate route following campus roads
+          let routeCoords = findCampusRoute(from, to);
 
-          // Fallback: straight line
-          if (!routeCoords) routeCoords = [from, to];
+          // Fallback to OSRM if off-campus or no route found
+          if (!routeCoords || routeCoords.length < 2) {
+            try {
+              const url = `https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${to[1]},${to[0]}?overview=full&geometries=geojson&alternatives=false`;
+              const res = await fetch(url);
+              const data = await res.json();
+              if (data.routes?.[0]) {
+                routeCoords = data.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+              }
+            } catch { /* use straight line fallback */ }
+          }
 
-          // Draw route
+          if (!routeCoords || routeCoords.length < 2) {
+            routeCoords = [from, to];
+          }
+
+          // Draw route following road network
           routeLine.current = L.polyline(routeCoords, {
             color: "#e36f54",
             weight: 5,
@@ -262,15 +464,19 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd },
             fillOpacity: 1,
           }).addTo(map.current).bindPopup(`<strong>${navigateTo.name}</strong><br/>Tujuanmu`);
 
-          // Fit view to route
-          const bounds = L.latLngBounds([from, to]);
+          // Fit view to entire route with comfortable padding
+          const bounds = L.latLngBounds(routeCoords);
           map.current.fitBounds(bounds, { padding: [60, 60], maxZoom: 18 });
 
-          // Nav info
-          const dist = map.current.distance(L.latLng(from), L.latLng(to));
-          const bearing = bearingTo(from, to);
+          // Calculate true walking distance along route segments
+          let totalDist = 0;
+          for (let i = 0; i < routeCoords.length - 1; i++) {
+            totalDist += map.current.distance(L.latLng(routeCoords[i]), L.latLng(routeCoords[i + 1]));
+          }
+          const nextStep = routeCoords[1] || to;
+          const bearing = bearingTo(from, nextStep);
           setNavInfo({
-            distance: dist < 1000 ? `${Math.round(dist)} m` : `${(dist / 1000).toFixed(1)} km`,
+            distance: totalDist < 1000 ? `${Math.round(totalDist)} m` : `${(totalDist / 1000).toFixed(1)} km`,
             bearing: Math.round(bearing),
             destName: navigateTo.name,
           });
