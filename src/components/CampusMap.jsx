@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback, useImperativeHandle, forwardRef } from "react";
 import "leaflet/dist/leaflet.css";
 
 const TELKOM_UNIVERSITY = [-6.9747, 107.6301];
@@ -27,19 +27,60 @@ const TELKOM_BOUNDARY = [
   [-6.9696164, 107.6275597], [-6.9696254, 107.6275329], [-6.9702045, 107.6267943],
   [-6.9707124, 107.6267702],
 ];
-const CAMPUS_PLACES = [
+export const CAMPUS_PLACES = [
   { name: "Telkom University", position: [-6.9747, 107.6301], kind: "Campus" },
   { name: "Telkom University Library", position: [-6.9729, 107.6294], kind: "Study space" },
   { name: "Telkom University Landmark Tower (TULT)", position: [-6.968949, 107.628111], kind: "Building" },
   { name: "Student Center", position: [-6.9771, 107.6298], kind: "Student spot" },
 ];
 
-export default function CampusMap() {
+/** Bearing in degrees from point A to B */
+function bearingTo([lat1, lng1], [lat2, lng2]) {
+  const toRad = (d) => (d * Math.PI) / 180;
+  const toDeg = (r) => (r * 180) / Math.PI;
+  const dLng = toRad(lng2 - lng1);
+  const y = Math.sin(dLng) * Math.cos(toRad(lat2));
+  const x = Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) - Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(dLng);
+  return (toDeg(Math.atan2(y, x)) + 360) % 360;
+}
+
+/** Create a rotatable arrow marker via DivIcon */
+function createArrowIcon(L, heading) {
+  return L.divIcon({
+    className: "heading-arrow",
+    html: `<div style="transform:rotate(${heading}deg);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:18px solid #e36f54;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))"></div>`,
+    iconSize: [16, 18],
+    iconAnchor: [8, 18],
+  });
+}
+
+const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd }, ref) {
   const mapElement = useRef(null);
   const map = useRef(null);
   const locationMarker = useRef(null);
+  const headingMarker = useRef(null);
+  const routeLine = useRef(null);
+  const destMarker = useRef(null);
+  const userPos = useRef(null);
+  const watchId = useRef(null);
+  const headingListenerRef = useRef(null);
   const [locationMessage, setLocationMessage] = useState("");
+  const [navInfo, setNavInfo] = useState(null); // { distance, bearing, destName }
 
+  // Clean route layers
+  const clearRoute = useCallback(() => {
+    routeLine.current?.remove();
+    routeLine.current = null;
+    destMarker.current?.remove();
+    destMarker.current = null;
+    headingMarker.current?.remove();
+    headingMarker.current = null;
+    setNavInfo(null);
+  }, []);
+
+  useImperativeHandle(ref, () => ({ clearRoute }), [clearRoute]);
+
+  // Init map
   useEffect(() => {
     if (!mapElement.current || map.current) return undefined;
     let disposed = false;
@@ -68,9 +109,7 @@ export default function CampusMap() {
         opacity: 0.95,
         fillColor: "#f39a7d",
         fillOpacity: 0.08,
-      }).addTo(campusMap).bindTooltip("Telkom University campus", {
-        sticky: true,
-      });
+      }).addTo(campusMap).bindTooltip("Telkom University campus", { sticky: true });
       const campusBounds = L.latLngBounds(TELKOM_BOUNDARY);
       campusMap.fitBounds(campusBounds, { padding: [18, 18] });
       campusMap.setMaxBounds(campusBounds.pad(0.08));
@@ -93,8 +132,158 @@ export default function CampusMap() {
       campusMap?.remove();
       map.current = null;
       locationMarker.current = null;
+      if (watchId.current != null) navigator.geolocation.clearWatch(watchId.current);
+      if (headingListenerRef.current) {
+        window.removeEventListener("deviceorientationabsolute", headingListenerRef.current);
+        window.removeEventListener("deviceorientation", headingListenerRef.current);
+      }
     };
   }, []);
+
+  // Start watching position continuously
+  const startWatchingPosition = useCallback(() => {
+    if (watchId.current != null) return; // already watching
+    if (!navigator.geolocation) return;
+    watchId.current = navigator.geolocation.watchPosition(
+      ({ coords }) => {
+        userPos.current = [coords.latitude, coords.longitude];
+      },
+      () => {},
+      { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 },
+    );
+  }, []);
+
+  // Device heading listener — rotates heading arrow to show direction
+  useEffect(() => {
+    function onOrientation(e) {
+      // alpha = compass heading (0=north). webkitCompassHeading for iOS
+      const heading = e.webkitCompassHeading ?? (e.alpha != null ? (360 - e.alpha) % 360 : null);
+      if (heading == null || !map.current || !userPos.current) return;
+
+      import("leaflet").then(({ default: L }) => {
+        if (!map.current || !userPos.current) return;
+        const icon = createArrowIcon(L, heading);
+        if (headingMarker.current) {
+          headingMarker.current.setLatLng(userPos.current);
+          headingMarker.current.setIcon(icon);
+        } else {
+          headingMarker.current = L.marker(userPos.current, { icon, interactive: false }).addTo(map.current);
+        }
+      });
+    }
+
+    // Prefer absolute orientation
+    if (typeof window !== "undefined" && "DeviceOrientationEvent" in window) {
+      // iOS 13+ needs permission
+      if (typeof DeviceOrientationEvent.requestPermission === "function") {
+        // We'll request on user gesture (locateStudent or navigate)
+      } else {
+        window.addEventListener("deviceorientationabsolute", onOrientation, true);
+        window.addEventListener("deviceorientation", onOrientation);
+      }
+      headingListenerRef.current = onOrientation;
+    }
+
+    return () => {
+      if (headingListenerRef.current) {
+        window.removeEventListener("deviceorientationabsolute", headingListenerRef.current);
+        window.removeEventListener("deviceorientation", headingListenerRef.current);
+      }
+    };
+  }, []);
+
+  // Navigation: draw route from user to target
+  useEffect(() => {
+    if (!navigateTo || !map.current) return;
+
+    async function navigate() {
+      setLocationMessage("Mencari lokasi kamu...");
+
+      // Request device orientation permission on iOS if needed
+      if (typeof DeviceOrientationEvent?.requestPermission === "function") {
+        try { await DeviceOrientationEvent.requestPermission(); } catch { /* user denied */ }
+        if (headingListenerRef.current) {
+          window.addEventListener("deviceorientationabsolute", headingListenerRef.current, true);
+          window.addEventListener("deviceorientation", headingListenerRef.current);
+        }
+      }
+
+      startWatchingPosition();
+
+      navigator.geolocation.getCurrentPosition(
+        async ({ coords }) => {
+          const from = [coords.latitude, coords.longitude];
+          userPos.current = from;
+          const to = navigateTo.position;
+          const L = (await import("leaflet")).default;
+          if (!map.current) return;
+
+          clearRoute();
+
+          // Try OSRM for walking route
+          let routeCoords;
+          try {
+            const url = `https://router.project-osrm.org/route/v1/foot/${from[1]},${from[0]};${to[1]},${to[0]}?overview=full&geometries=geojson`;
+            const res = await fetch(url);
+            const data = await res.json();
+            if (data.routes?.[0]) {
+              routeCoords = data.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+            }
+          } catch { /* fallback to straight line */ }
+
+          // Fallback: straight line
+          if (!routeCoords) routeCoords = [from, to];
+
+          // Draw route
+          routeLine.current = L.polyline(routeCoords, {
+            color: "#e36f54",
+            weight: 5,
+            opacity: 0.85,
+            dashArray: "10 6",
+            lineCap: "round",
+          }).addTo(map.current);
+
+          // User location marker
+          if (locationMarker.current) locationMarker.current.remove();
+          locationMarker.current = L.circleMarker(from, {
+            radius: 9,
+            color: "#ffffff",
+            weight: 3,
+            fillColor: "#e36f54",
+            fillOpacity: 1,
+          }).addTo(map.current).bindPopup("<strong>Kamu di sini</strong>").openPopup();
+
+          // Destination marker
+          destMarker.current = L.circleMarker(to, {
+            radius: 10,
+            color: "#ffffff",
+            weight: 3,
+            fillColor: "#4b8fa4",
+            fillOpacity: 1,
+          }).addTo(map.current).bindPopup(`<strong>${navigateTo.name}</strong><br/>Tujuanmu`);
+
+          // Fit view to route
+          const bounds = L.latLngBounds([from, to]);
+          map.current.fitBounds(bounds, { padding: [60, 60], maxZoom: 18 });
+
+          // Nav info
+          const dist = map.current.distance(L.latLng(from), L.latLng(to));
+          const bearing = bearingTo(from, to);
+          setNavInfo({
+            distance: dist < 1000 ? `${Math.round(dist)} m` : `${(dist / 1000).toFixed(1)} km`,
+            bearing: Math.round(bearing),
+            destName: navigateTo.name,
+          });
+          setLocationMessage("");
+        },
+        () => {
+          setLocationMessage("Gagal mengakses lokasi. Cek izin browser.");
+        },
+        { enableHighAccuracy: true, timeout: 10000 },
+      );
+    }
+    navigate();
+  }, [navigateTo, clearRoute, startWatchingPosition]);
 
   function locateStudent() {
     if (!map.current || !navigator.geolocation) {
@@ -102,15 +291,24 @@ export default function CampusMap() {
       return;
     }
 
+    // iOS orientation permission on user gesture
+    if (typeof DeviceOrientationEvent?.requestPermission === "function") {
+      DeviceOrientationEvent.requestPermission().catch(() => {});
+      if (headingListenerRef.current) {
+        window.addEventListener("deviceorientationabsolute", headingListenerRef.current, true);
+        window.addEventListener("deviceorientation", headingListenerRef.current);
+      }
+    }
+
+    startWatchingPosition();
     setLocationMessage("Finding your location...");
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
         const studentPosition = [coords.latitude, coords.longitude];
+        userPos.current = studentPosition;
         import("leaflet").then(({ default: L }) => {
           if (!map.current) return;
-          if (locationMarker.current) {
-            locationMarker.current.remove();
-          }
+          if (locationMarker.current) locationMarker.current.remove();
           map.current.setView(studentPosition, 17);
           locationMarker.current = L.circleMarker(studentPosition, {
             radius: 9,
@@ -139,7 +337,19 @@ export default function CampusMap() {
         <div><strong>Telkom University</strong><span>Bandung campus</span></div>
         <button type="button" onClick={locateStudent} aria-label="Show my location">◎</button>
       </div>
+      {navInfo && (
+        <div className="nav-info-bar" role="status">
+          <span className="nav-arrow" style={{ transform: `rotate(${navInfo.bearing}deg)` }}>↑</span>
+          <div>
+            <strong>{navInfo.destName}</strong>
+            <span>{navInfo.distance}</span>
+          </div>
+          <button type="button" className="nav-cancel" onClick={() => { clearRoute(); onNavigationEnd?.(); }} aria-label="Batalkan navigasi">✕</button>
+        </div>
+      )}
       {locationMessage && <p className="map-status" role="status">{locationMessage}</p>}
     </div>
   );
-}
+});
+
+export default CampusMap;
