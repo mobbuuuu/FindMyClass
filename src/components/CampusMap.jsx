@@ -37,6 +37,7 @@ const CAMPUS_PLACES = [
 export default function CampusMap() {
   const mapElement = useRef(null);
   const map = useRef(null);
+  const locationMarker = useRef(null);
   const [locationMessage, setLocationMessage] = useState("");
 
   useEffect(() => {
@@ -91,6 +92,7 @@ export default function CampusMap() {
       disposed = true;
       campusMap?.remove();
       map.current = null;
+      locationMarker.current = null;
     };
   }, []);
 
@@ -106,8 +108,11 @@ export default function CampusMap() {
         const studentPosition = [coords.latitude, coords.longitude];
         import("leaflet").then(({ default: L }) => {
           if (!map.current) return;
+          if (locationMarker.current) {
+            locationMarker.current.remove();
+          }
           map.current.setView(studentPosition, 17);
-          L.circleMarker(studentPosition, {
+          locationMarker.current = L.circleMarker(studentPosition, {
             radius: 9,
             color: "#ffffff",
             weight: 3,
