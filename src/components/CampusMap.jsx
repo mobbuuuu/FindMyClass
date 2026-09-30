@@ -30,24 +30,24 @@ const TELKOM_BOUNDARY = [
 export const CAMPUS_PLACES = [
   // 1-6: Utama
   { name: "Asrama Putra", position: [-6.9711944444, 107.6287777778], kind: "Dormitory" }, // 6°58'16.3"S 107°37'43.6"E
-  { name: "Sport Center", position: [-6.9715555556, 107.6287500000], kind: "Sports" }, // 6°58'17.6"S 107°37'43.5"E
+  { name: "Sport Center", position: [-6.97245, 107.6289], kind: "Sports" }, // 6°58'20.8"S 107°37'44.0"E
   { name: "Asrama Putri", position: [-6.9743055556, 107.6290555556], kind: "Dormitory" }, // 6°58'27.5"S 107°37'44.6"E
   { name: "Tel-U Coffee", position: [-6.9731388889, 107.6293055556], kind: "Cafe" }, // 6°58'23.3"S 107°37'45.5"E
-  { name: "Telkom University Library, Study Space", position: [-6.9720277778, 107.6321944444], kind: "Study space" }, // 6°58'19.3"S 107°37'55.9"E
+  { name: "Telkom University Library, Study Space", position: [-6.971760334262225, 107.6324196103809], kind: "Study space" }, // 6°58'19.3"S 107°37'55.9"E
   { name: "Telkom University Campus", position: [-6.9729166667, 107.6300000000], kind: "Campus" }, // 6°58'22.5"S 107°37'48.0"E
   { name: "Telkom University Landmark Tower (TULT)", position: [-6.968949, 107.628111], kind: "Building" },
 
   // Tambahan 1-6
-  { name: "Fakultas Komunikasi dan Ilmu Sosial", position: [-6.9721666667, 107.6326944444], kind: "Faculty" }, // 6°58'19.8"S 107°37'57.7"E
+  { name: "Fakultas Komunikasi dan Ilmu Sosial", position: [-6.972002173916829, 107.63281880706629], kind: "Faculty" }, // 6°58'19.8"S 107°37'57.7"E
   { name: "Fakultas Ilmu Terapan", position: [-6.9731944444, 107.6326666667], kind: "Faculty" }, // 6°58'23.5"S 107°37'57.6"E
-  { name: "Fakultas Ekonomi dan Bisnis", position: [-6.9716111111, 107.6319166667], kind: "Faculty" }, // 6°58'17.8"S 107°37'54.9"E
+  { name: "Fakultas Ekonomi dan Bisnis", position: [-6.971336184403436, 107.631943572998], kind: "Faculty" }, // 6°58'17.8"S 107°37'54.9"E
   { name: "Fakultas Industri Kreatif", position: [-6.9717777778, 107.6315000000], kind: "Faculty" }, // 6°58'18.4"S 107°37'53.4"E
   { name: "Telkom University Convention Hall", position: [-6.9712777778, 107.6312222222], kind: "Hall" }, // 6°58'16.6"S 107°37'52.4"E
   { name: "Danau Galau", position: [-6.9731666667, 107.6312777778], kind: "Landmark" }, // 6°58'23.4"S 107°37'52.6"E
 
   // Tambahan 7-9: GKU
-  { name: "Gedung Kuliah Umum 1", position: [-6.973722, 107.630389], kind: "Lecture", address: "Jl. Telekomunikasi, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257" },
-  { name: "Gedung Kuliah Umum 2", position: [-6.974781089939965, 107.63127936346625], kind: "Lecture" },
+  { name: "Gedung Kuliah Umum 1", position: [-6.974390859546471, 107.63106844734378], kind: "Lecture", address: "Jl. Telekomunikasi, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257" },
+  { name: "Gedung Kuliah Umum 2", position: [-6.9748408361847485, 107.63105842897347], kind: "Lecture" },
   { name: "Gedung Kuliah Umum 3", position: [-6.972866066219806, 107.6298691237254], kind: "Lecture" },
 
   // Tambahan 10-15
@@ -59,135 +59,202 @@ export const CAMPUS_PLACES = [
   { name: "Masjid Syamsul Ulum", position: [-6.975699272034128, 107.6321904194122], kind: "Mosque" },
 
   // Tambahan 16-20: Gates
-  { name: "Gate 1", position: [-6.973450, 107.631600], kind: "Gate", address: "Stt Telkom, Jl. Telekomunikasi Jl. Sukapura, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40267" },
-  { name: "Gate 2", position: [-6.974139, 107.630944], kind: "Gate", address: "2JGM+P8R, Jl. Telekomunikasi, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257" },
-  { name: "Gate 3", position: [-6.973917, 107.630056], kind: "Gate", address: "2JGM+C26, Jl. Telekomunikasi, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257" },
-  { name: "Gate 4", position: [-6.975200, 107.633400], kind: "Gate", address: "Jl. Sukabirus No.72, Sukapura, Kec. Dayeuhkolot, Kota Bandung, Jawa Barat 40257" },
-  { name: "Gate 5", position: [-6.977625, 107.627938], kind: "Gate", address: "2JFH+WH5, Jl. Radio Palasari Road, Citeureup, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257" },
+  { name: "Gate 1", position: [-6.972076, 107.633449], kind: "Gate", address: "Stt Telkom, Jl. Telekomunikasi Jl. Sukapura, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40267" },
+  { name: "Gate 2", position: [-6.973109, 107.633289], kind: "Gate", address: "2JGM+P8R, Jl. Telekomunikasi, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257" },
+  { name: "Gate 3", position: [-6.974003, 107.632496], kind: "Gate", address: "2JGM+C26, Jl. Telekomunikasi, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257" },
+  { name: "Gate 4", position: [-6.976102, 107.632827], kind: "Gate", address: "Jl. Sukabirus No.72, Sukapura, Kec. Dayeuhkolot, Kota Bandung, Jawa Barat 40257" },
+  { name: "Gate 5", position: [-6.975225, 107.628982], kind: "Gate", address: "2JFH+WH5, Jl. Radio Palasari Road, Citeureup, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257" },
 ];
 
 /** Campus road and walkway network nodes [lat, lng] — synced to CAMPUS_PLACES */
 const CAMPUS_GRAPH_NODES = {
-  // Asrama Putra & Sport Center (user coords)
+  // Asrama Putra internal grid
   asrama_putra: [-6.9711944444, 107.6287777778],
-  sport_center: [-6.9715555556, 107.6287500000],
-  asrama_p_south: [-6.9722, 107.6288],
+  asrama_p_nw: [-6.9710, 107.6285],
+  asrama_p_g5: [-6.9712, 107.6288],
+  asrama_p_g2: [-6.9712, 107.6293],
+  asrama_p_mid_w: [-6.9717, 107.6285],
+  asrama_p_mid_c: [-6.9717, 107.6288],
+  asrama_p_mid_e: [-6.9717, 107.6293],
+  asrama_p_sw: [-6.97218, 107.6285],
+  asrama_p_sc: [-6.97218, 107.6288],
   asrama_tj_mart: [-6.97218, 107.62935],
 
-  // Road north of Sport Center & Parking Lot P
-  road_sport_center: [-6.97222, 107.6297],
-  road_park_n1: [-6.97226, 107.6301],
-  road_park_n2: [-6.97230, 107.6306],
-  road_park_n3: [-6.97235, 107.6310],
-  road_park_ne: [-6.97238, 107.6313],
+  // TULT (North)
+  tult: [-6.968949, 107.628111],
+  road_tult_approach: [-6.9698, 107.6282],
+  road_north_gate: [-6.9708, 107.6283],
 
-  // East cluster: FEB / FIK / TUCH / Library / FKS
-  feb: [-6.9716111111, 107.6319166667],
-  fik: [-6.9717777778, 107.6315000000],
+  // Northern Ring Road (TJ Mart -> TUCH -> FEB -> Gate 1)
+  road_sc_north: [-6.97218, 107.62970],
+  road_btp_junc: [-6.97215, 107.63030],
+  road_tuch_north: [-6.97185, 107.63095],
   tuch: [-6.9712777778, 107.6312222222],
-  library: [-6.9720277778, 107.6321944444],
-  fks: [-6.9721666667, 107.6326944444],
-  fit: [-6.9731944444, 107.6326666667],
-  danau_galau: [-6.9731666667, 107.6312777778],
-  road_lake_4: [-6.97330, 107.63085],
-  road_library_junc: [-6.97340, 107.63070],
+  road_feb_north: [-6.97150, 107.63170],
+  feb: [-6.971336184403436, 107.631943572998],
+  road_feb_corner: [-6.97135, 107.63215],
+  road_gate1_approach: [-6.97180, 107.63290],
+  gate1: [-6.972076, 107.633449],
 
-  // Central: campus center / GKU1 / GKU3 / Tel-U Coffee / Asrama Putri
-  telkom_univ: [-6.9729166667, 107.6300000000],
-  gku1: [-6.973722, 107.630389],
-  gku3: [-6.972866066219806, 107.6298691237254],
+  // Eastern Ring Road (Gate 1 -> FKS -> Gate 2 -> FIT -> Gate 3 -> Gate 4)
+  road_fks_front: [-6.97205, 107.63285],
+  fks: [-6.972002173916829, 107.63281880706629],
+  library: [-6.971760334262225, 107.6324196103809],
+  road_fks_south: [-6.97260, 107.63280],
+  gate2_junc: [-6.97310, 107.63280],
+  gate2: [-6.973109, 107.633289],
+  fit: [-6.9731944444, 107.6326666667],
+  road_fit_front: [-6.97355, 107.63270],
+  gate3: [-6.974003, 107.632496],
+  road_east_south: [-6.97480, 107.63240],
+  road_masjid_east: [-6.97550, 107.63240],
+  gate4: [-6.976102, 107.632827],
+
+  // FIK & East of Danau Galau
+  road_fik_front: [-6.97185, 107.63155],
+  fik: [-6.9717777778, 107.6315000000],
+  road_danau_east: [-6.97310, 107.63170],
+  danau_galau: [-6.9731666667, 107.6312777778],
+  road_danau_se: [-6.97360, 107.63150],
+
+  // West road along Sport Center & Asrama Putri
+  sport_center: [-6.97245, 107.6289],
+  road_sc_south: [-6.97260, 107.62935],
+  road_ku3_west: [-6.97290, 107.62940],
   telu_coffee: [-6.9731388889, 107.6293055556],
+  road_asrama_putri_junc: [-6.97350, 107.62940],
   asrama_putri: [-6.9743055556, 107.6290555556],
   foodcourt_putri: [-6.9741944444, 107.6292777778],
-  road_ku_south: [-6.97380, 107.6301],
-
-  // South: GKU2 / FTE / FIF / GSG / Masjid / Gates
-  gku2: [-6.974781089939965, 107.63127936346625],
   kantin_putri: [-6.974439793270318, 107.6287960878003],
-  fte: [-6.975473686188717, 107.6295071364736],
-  fif: [-6.9758309689279425, 107.63069039465188],
-  gsg: [-6.9763885581062715, 107.63028949108872],
-  masjid: [-6.975699272034128, 107.6321904194122],
-  gate1: [-6.973450, 107.631600],
-  gate2: [-6.974139, 107.630944],
-  gate3: [-6.973917, 107.630056],
-  gate4: [-6.975200, 107.633400],
-  gate5: [-6.977625, 107.627938],
+  road_gate5_approach: [-6.97490, 107.62900],
+  gate5: [-6.975225, 107.628982],
 
-  // North road towards TULT
-  road_north_gate: [-6.9708, 107.6283],
-  road_tult_approach: [-6.9698, 107.6282],
-  tult: [-6.968949, 107.628111],
+  // Central KU3 Plaza & Around Danau Galau
+  gku3: [-6.972866066219806, 107.6298691237254],
+  road_ku3_north: [-6.97265, 107.62990],
+  road_ku3_east: [-6.97290, 107.63030],
+  road_poliklinik: [-6.97350, 107.63030],
+  telkom_univ: [-6.9729166667, 107.6300000000],
+  road_danau_south: [-6.97365, 107.63090],
+
+  // Central Boulevard towards Gate 3 & South Campus
+  road_rektorat_roundabout: [-6.97400, 107.63050],
+  road_boulevard_to_gate3: [-6.97400, 107.63170],
+  road_gku1: [-6.97440, 107.63050],
+  gku1: [-6.974390859546471, 107.63106844734378],
+  road_gku2: [-6.97485, 107.63050],
+  gku2: [-6.9748408361847485, 107.63105842897347],
+  road_fte: [-6.97545, 107.63010],
+  fte: [-6.975473686188717, 107.6295071364736],
+  road_fif: [-6.97580, 107.63050],
+  fif: [-6.9758309689279425, 107.63069039465188],
+  road_gsg: [-6.97635, 107.63030],
+  gsg: [-6.9763885581062715, 107.63028949108872],
+  road_masjid: [-6.97570, 107.63210],
+  masjid: [-6.975699272034128, 107.6321904194122],
 };
 
-/** Connected walkway segments across campus — fully connected to all new nodes */
+/** Connected walkway segments across campus — strictly following real roads & paths */
 const CAMPUS_GRAPH_EDGES = [
-  // Asrama Putra / Sport Center cluster
-  ["asrama_putra", "sport_center"],
-  ["asrama_putra", "asrama_tj_mart"],
-  ["asrama_putra", "asrama_p_south"],
-  ["sport_center", "asrama_tj_mart"],
-  ["sport_center", "road_sport_center"],
-  ["asrama_tj_mart", "road_sport_center"],
-  ["asrama_p_south", "asrama_tj_mart"],
+  // Asrama Putra internal walkways
+  ["asrama_putra", "asrama_p_g5"],
+  ["asrama_p_nw", "asrama_p_g5"],
+  ["asrama_p_g5", "asrama_p_g2"],
+  ["asrama_p_nw", "asrama_p_mid_w"],
+  ["asrama_p_g5", "asrama_p_mid_c"],
+  ["asrama_p_g2", "asrama_p_mid_e"],
+  ["asrama_p_mid_w", "asrama_p_mid_c"],
+  ["asrama_p_mid_c", "asrama_p_mid_e"],
+  ["asrama_p_mid_w", "asrama_p_sw"],
+  ["asrama_p_mid_c", "asrama_p_sc"],
+  ["asrama_p_mid_e", "asrama_tj_mart"],
+  ["asrama_p_sw", "asrama_p_sc"],
+  ["asrama_p_sc", "asrama_tj_mart"],
 
-  // Road north of Sport Center & Parking Lot P
-  ["road_sport_center", "road_park_n1"],
-  ["road_park_n1", "road_park_n2"],
-  ["road_park_n2", "road_park_n3"],
-  ["road_park_n3", "road_park_ne"],
-
-  // East cluster: FEB / FIK / TUCH / Library / FKS / FIT / Danau
-  ["road_park_ne", "road_lake_4"],
-  ["road_lake_4", "road_library_junc"],
-  ["road_library_junc", "library"],
-  ["road_library_junc", "telu_coffee"],
-  ["road_library_junc", "gku1"],
-  ["road_library_junc", "gku3"],
-  ["road_library_junc", "fik"],
-  ["road_library_junc", "feb"],
-  ["road_library_junc", "tuch"],
-  ["library", "fks"],
-  ["library", "fit"],
-  ["library", "danau_galau"],
-  ["fks", "fit"],
-  ["tuch", "fik"],
-  ["fik", "feb"],
-
-  // Central spine: campus center / GKU1 / GKU3 / Tel-U Coffee / Asrama Putri / Food Court
-  ["road_library_junc", "gku1"],
-  ["gku1", "telkom_univ"],
-  ["gku1", "gku3"],
-  ["gku1", "telu_coffee"],
-  ["gku3", "telkom_univ"],
-  ["telkom_univ", "telu_coffee"],
-  ["telkom_univ", "asrama_putri"],
-  ["asrama_putri", "foodcourt_putri"],
-  ["asrama_putri", "kantin_putri"],
-  ["asrama_putri", "road_ku_south"],
-  ["road_ku_south", "kantin_putri"],
-  ["road_ku_south", "road_sport_center"],
-
-  // South boulevard to gates & tech faculties
-  ["telkom_univ", "gku2"],
-  ["gku2", "fif"],
-  ["gku2", "gate2"],
-  ["fif", "gate2"],
-  ["fif", "gsg"],
-  ["fif", "fte"],
-  ["fte", "gate5"],
-  ["fte", "gate1"],
-  ["gate1", "masjid"],
-  ["masjid", "gate4"],
-  ["masjid", "gsg"],
-  ["gate3", "gate2"],
-  ["gate3", "fks"],
-  ["gate4", "gate5"],
-
-  // North path to TULT
-  ["asrama_putra", "road_north_gate"],
+  // North to TULT
+  ["asrama_p_nw", "road_north_gate"],
   ["road_north_gate", "road_tult_approach"],
   ["road_tult_approach", "tult"],
+
+  // Northern Ring Road (TJ Mart -> TUCH -> FEB -> Gate 1)
+  ["asrama_tj_mart", "road_sc_north"],
+  ["road_sc_north", "road_btp_junc"],
+  ["road_btp_junc", "road_tuch_north"],
+  ["road_tuch_north", "tuch"],
+  ["road_tuch_north", "road_feb_north"],
+  ["road_feb_north", "feb"],
+  ["road_feb_north", "road_feb_corner"],
+  ["road_feb_corner", "road_gate1_approach"],
+  ["road_gate1_approach", "gate1"],
+  ["road_gate1_approach", "road_fks_front"],
+
+  // Eastern Ring Road (Gate 1 -> FKS -> Gate 2 -> FIT -> Gate 3 -> Gate 4)
+  ["road_fks_front", "fks"],
+  ["road_fks_front", "library"],
+  ["road_fks_front", "road_fks_south"],
+  ["road_fks_south", "gate2_junc"],
+  ["gate2_junc", "gate2"],
+  ["gate2_junc", "fit"],
+  ["gate2_junc", "road_fit_front"],
+  ["road_fit_front", "gate3"],
+  ["gate3", "road_east_south"],
+  ["road_east_south", "road_masjid_east"],
+  ["road_masjid_east", "gate4"],
+  ["road_masjid_east", "road_masjid"],
+
+  // FIK and East of Danau Galau
+  ["road_tuch_north", "road_fik_front"],
+  ["road_fik_front", "fik"],
+  ["road_fik_front", "road_fks_front"],
+  ["road_fik_front", "road_danau_east"],
+  ["road_danau_east", "road_fks_south"],
+  ["road_danau_east", "road_fit_front"],
+  ["road_danau_east", "danau_galau"],
+  ["road_danau_east", "road_danau_se"],
+  ["road_danau_se", "road_boulevard_to_gate3"],
+
+  // West road along Sport Center & Asrama Putri
+  ["asrama_tj_mart", "road_sc_south"],
+  ["sport_center", "road_sc_north"],
+  ["sport_center", "road_sc_south"],
+  ["road_sc_south", "road_ku3_west"],
+  ["road_ku3_west", "telu_coffee"],
+  ["road_ku3_west", "road_asrama_putri_junc"],
+  ["road_asrama_putri_junc", "asrama_putri"],
+  ["road_asrama_putri_junc", "foodcourt_putri"],
+  ["road_asrama_putri_junc", "kantin_putri"],
+  ["road_asrama_putri_junc", "road_gate5_approach"],
+  ["road_gate5_approach", "gate5"],
+
+  // Central KU3 Plaza & South of Danau Galau
+  ["road_sc_south", "road_ku3_north"],
+  ["road_ku3_north", "gku3"],
+  ["road_ku3_north", "road_ku3_east"],
+  ["road_ku3_west", "gku3"],
+  ["road_ku3_east", "telkom_univ"],
+  ["road_ku3_east", "road_poliklinik"],
+  ["road_asrama_putri_junc", "road_poliklinik"],
+  ["road_poliklinik", "road_rektorat_roundabout"],
+  ["road_poliklinik", "road_danau_south"],
+  ["road_danau_south", "road_danau_se"],
+  ["road_danau_south", "road_rektorat_roundabout"],
+
+  // Central Boulevard to Gate 3 & South Campus
+  ["road_rektorat_roundabout", "road_boulevard_to_gate3"],
+  ["road_boulevard_to_gate3", "gate3"],
+  ["road_rektorat_roundabout", "road_gku1"],
+  ["road_gku1", "gku1"],
+  ["road_gku1", "road_gku2"],
+  ["road_gku2", "gku2"],
+  ["road_gku2", "road_fte"],
+  ["road_fte", "fte"],
+  ["road_fte", "road_fif"],
+  ["road_fif", "fif"],
+  ["road_fif", "road_gsg"],
+  ["road_gsg", "gsg"],
+  ["road_fte", "road_gate5_approach"],
+  ["road_fif", "road_masjid"],
+  ["road_masjid", "masjid"],
 ];
 
 function distBetween([lat1, lng1], [lat2, lng2]) {
