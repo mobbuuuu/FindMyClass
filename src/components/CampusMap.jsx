@@ -28,46 +28,49 @@ const TELKOM_BOUNDARY = [
   [-6.9707124, 107.6267702],
 ];
 export const CAMPUS_PLACES = [
-  // 1-6: Utama (DMS persis dari user)
-  { name: "Asrama Putra", position: [-6.971194, 107.628778], kind: "Dormitory" }, // 6°58'16.3"S 107°37'43.6"E
-  { name: "Sport Center", position: [-6.971556, 107.628750], kind: "Sports" }, // 6°58'17.6"S 107°37'43.5"E
-  { name: "Asrama Putri", position: [-6.974306, 107.629056], kind: "Dormitory" }, // 6°58'27.5"S 107°37'44.6"E
-  { name: "Tel-U Coffee", position: [-6.973139, 107.629306], kind: "Cafe" }, // 6°58'23.3"S 107°37'45.5"E
-  { name: "Telkom University Library", position: [-6.972028, 107.632194], kind: "Study space" }, // 6°58'19.3"S 107°37'55.9"E
-  { name: "Telkom University", position: [-6.972917, 107.630000], kind: "Campus" }, // 6°58'22.5"S 107°37'48.0"E
+  // 1-6: Utama
+  { name: "Asrama Putra", position: [-6.9711944, 107.6287778], kind: "Dormitory" }, // 6°58'16.3"S 107°37'43.6"E
+  { name: "Sport Center", position: [-6.9715556, 107.6287500], kind: "Sports" }, // 6°58'17.6"S 107°37'43.5"E
+  { name: "Asrama Putri", position: [-6.9743056, 107.6290556], kind: "Dormitory" }, // 6°58'27.5"S 107°37'44.6"E
+  { name: "Tel-U Coffee", position: [-6.9731389, 107.6293056], kind: "Cafe" }, // 6°58'23.3"S 107°37'45.5"E
+  { name: "Telkom University Library, Study Space", position: [-6.9720278, 107.6321944], kind: "Study space" }, // 6°58'19.3"S 107°37'55.9"E
+  { name: "Telkom University Campus", position: [-6.9729167, 107.6299999], kind: "Campus" }, // 6°58'22.5"S 107°37'48.0"E
   { name: "Telkom University Landmark Tower (TULT)", position: [-6.968949, 107.628111], kind: "Building" },
+
   // Tambahan 1-6
-  { name: "Fakultas Komunikasi dan Ilmu Sosial", position: [-6.972167, 107.632694], kind: "Faculty" }, // 6°58'19.8"S 107°37'57.7"E
-  { name: "Fakultas Ilmu Terapan", position: [-6.973194, 107.632667], kind: "Faculty" }, // 6°58'23.5"S 107°37'57.6"E
-  { name: "Fakultas Ekonomi dan Bisnis", position: [-6.971611, 107.631917], kind: "Faculty" }, // 6°58'17.8"S 107°37'54.9"E
-  { name: "Fakultas Industri Kreatif", position: [-6.971778, 107.631500], kind: "Faculty" }, // 6°58'18.4"S 107°37'53.4"E
-  { name: "Telkom University Convention Hall", position: [-6.971278, 107.631222], kind: "Hall" }, // 6°58'16.6"S 107°37'52.4"E
-  { name: "Danau Galau", position: [-6.973167, 107.631278], kind: "Landmark" }, // 6°58'23.4"S 107°37'52.6"E
+  { name: "Fakultas Komunikasi dan Ilmu Sosial", position: [-6.9721667, 107.6326944], kind: "Faculty" }, // 6°58'19.8"S 107°37'57.7"E
+  { name: "Fakultas Ilmu Terapan", position: [-6.9731944, 107.6326667], kind: "Faculty" }, // 6°58'23.5"S 107°37'57.6"E
+  { name: "Fakultas Ekonomi dan Bisnis", position: [-6.9716111, 107.6319167], kind: "Faculty" }, // 6°58'17.8"S 107°37'54.9"E
+  { name: "Fakultas Industri Kreatif", position: [-6.9717778, 107.6315000], kind: "Faculty" }, // 6°58'18.4"S 107°37'53.4"E
+  { name: "Telkom University Convention Hall", position: [-6.9712778, 107.6312222], kind: "Hall" }, // 6°58'16.6"S 107°37'52.4"E
+  { name: "Danau Galau", position: [-6.9731667, 107.6312778], kind: "Landmark" }, // 6°58'23.4"S 107°37'52.6"E
+
   // Tambahan 7-9: GKU
-  { name: "Gedung Kuliah Umum 1 (Tokong Nanas)", position: [-6.973722, 107.630389], kind: "Lecture" },
+  { name: "Gedung Kuliah Umum 1", position: [-6.973722, 107.630389], kind: "Lecture" }, // Jl. Telekomunikasi Sukapura
   { name: "Gedung Kuliah Umum 2", position: [-6.974781, 107.631279], kind: "Lecture" }, // -6.974781089939965, 107.63127936346625
   { name: "Gedung Kuliah Umum 3", position: [-6.972866, 107.629869], kind: "Lecture" }, // -6.972866066219806, 107.6298691237254
-  // Tambahan 10-11
-  { name: "Food Court Asrama Putri", position: [-6.974194, 107.629278], kind: "Food Court" }, // 6°58'27.1"S 107°37'45.4"E
+
+  // Tambahan 10-15
+  { name: "Food Court Asrama Putri", position: [-6.9741944, 107.6292778], kind: "Food Court" }, // 6°58'27.1"S 107°37'45.4"E
   { name: "Kantin Putri", position: [-6.974440, 107.628796], kind: "Canteen" }, // -6.974439793270318, 107.6287960878003
-  // Tambahan 12-15
-  { name: "Fakultas Teknik Elektro", position: [-6.975474, 107.629507], kind: "Faculty" },
-  { name: "Fakultas Informatika", position: [-6.975831, 107.630690], kind: "Faculty" },
-  { name: "Gedung Serba Guna", position: [-6.976389, 107.630289], kind: "Hall" },
-  { name: "Masjid Syamsul Ulum", position: [-6.975699, 107.632190], kind: "Mosque" },
+  { name: "Fakultas Teknik Elektro", position: [-6.975474, 107.629507], kind: "Faculty" }, // -6.975473686188717, 107.6295071364736
+  { name: "Fakultas Informatika", position: [-6.975831, 107.630690], kind: "Faculty" }, // -6.9758309689279425, 107.63069039465188
+  { name: "Gedung Serba guna", position: [-6.976389, 107.630289], kind: "Hall" }, // -6.9763885581062715, 107.63028949108872
+  { name: "Masjid Syamsul Ulum", position: [-6.975699, 107.632190], kind: "Mosque" }, // -6.975699272034128, 107.6321904194122
+
   // Tambahan 16-20: Gates
-  { name: "Gate 1 - Stt Telkom", position: [-6.973450, 107.631600], kind: "Gate" },
-  { name: "Gate 2 - 2JGM+P8R", position: [-6.974139, 107.630944], kind: "Gate" },
-  { name: "Gate 3 - 2JGM+C26", position: [-6.973917, 107.630056], kind: "Gate" },
-  { name: "Gate 4 - Jl. Sukabirus No.72", position: [-6.975200, 107.633400], kind: "Gate" },
-  { name: "Gate 5 - Jl. Radio Palasari", position: [-6.977625, 107.627938], kind: "Gate" },
+  { name: "Gate 1", position: [-6.973450, 107.631600], kind: "Gate" },
+  { name: "Gate 2", position: [-6.974139, 107.630944], kind: "Gate" }, // 2JGM+P8R
+  { name: "Gate 3", position: [-6.973917, 107.630056], kind: "Gate" }, // 2JGM+C26
+  { name: "Gate 4", position: [-6.975200, 107.633400], kind: "Gate" },
+  { name: "Gate 5", position: [-6.977625, 107.627938], kind: "Gate" }, // 2JFH+WH5
 ];
 
 /** Campus road and walkway network nodes [lat, lng] — synced to CAMPUS_PLACES */
 const CAMPUS_GRAPH_NODES = {
   // Asrama Putra & Sport Center (user coords)
-  asrama_putra: [-6.971194, 107.628778],
-  sport_center: [-6.971556, 107.628750],
+  asrama_putra: [-6.9711944, 107.6287778],
+  sport_center: [-6.9715556, 107.6287500],
   asrama_p_south: [-6.9722, 107.6288],
   asrama_tj_mart: [-6.97218, 107.62935],
 
@@ -79,23 +82,23 @@ const CAMPUS_GRAPH_NODES = {
   road_park_ne: [-6.97238, 107.6313],
 
   // East cluster: FEB / FIK / TUCH / Library / FKS
-  feb: [-6.971611, 107.631917],
-  fik: [-6.971778, 107.631500],
-  tuch: [-6.971278, 107.631222],
-  library: [-6.972028, 107.632194],
-  fks: [-6.972167, 107.632694],
-  fit: [-6.973194, 107.632667],
-  danau_galau: [-6.973167, 107.631278],
+  feb: [-6.9716111, 107.6319167],
+  fik: [-6.9717778, 107.6315000],
+  tuch: [-6.9712778, 107.6312222],
+  library: [-6.9720278, 107.6321944],
+  fks: [-6.9721667, 107.6326944],
+  fit: [-6.9731944, 107.6326667],
+  danau_galau: [-6.9731667, 107.6312778],
   road_lake_4: [-6.97330, 107.63085],
   road_library_junc: [-6.97340, 107.63070],
 
   // Central: campus center / GKU1 / GKU3 / Tel-U Coffee / Asrama Putri
-  telkom_univ: [-6.972917, 107.630000],
+  telkom_univ: [-6.9729167, 107.6299999],
   gku1: [-6.973722, 107.630389],
   gku3: [-6.972866, 107.629869],
-  telu_coffee: [-6.973139, 107.629306],
-  asrama_putri: [-6.974306, 107.629056],
-  foodcourt_putri: [-6.974194, 107.629278],
+  telu_coffee: [-6.9731389, 107.6293056],
+  asrama_putri: [-6.9743056, 107.6290556],
+  foodcourt_putri: [-6.9741944, 107.6292778],
   road_ku_south: [-6.97380, 107.6301],
 
   // South: GKU2 / FTE / FIF / GSG / Masjid / Gates
