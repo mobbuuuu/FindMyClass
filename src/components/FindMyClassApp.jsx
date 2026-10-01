@@ -26,6 +26,9 @@ export default function FindMyClassApp() {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [navigateTo, setNavigateTo] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
+  const [showTransportModal, setShowTransportModal] = useState(false);
+  const [showGatePicker, setShowGatePicker] = useState(false);
+  const [selectedTransportMode, setSelectedTransportMode] = useState(null);
   const [savedPlaces, setSavedPlaces] = useState([
     CAMPUS_PLACES.find((p) => p.name.includes("Landmark Tower")) || CAMPUS_PLACES[0],
     CAMPUS_PLACES.find((p) => p.name.includes("Library")) || CAMPUS_PLACES[1],
@@ -82,9 +85,30 @@ export default function FindMyClassApp() {
     mapRef.current?.panToPlace(place);
   }
 
-  function handleNavigate(place) {
-    setNavigateTo({ ...place });
+  function handleNavigate(place, mode = "walk") {
+    // For motor/car, show gate picker first
+    if (mode === "motor" || mode === "car") {
+      setSelectedTransportMode(mode);
+      setShowTransportModal(false);
+      setShowGatePicker(true);
+      return;
+    }
+    // For walk/beam, navigate directly
+    setNavigateTo({ ...place, mode });
     setSelectedPlace(null);
+    setShowTransportModal(false);
+    setQuery("");
+    setShowProfile(false);
+    setActiveTab("Explore");
+  }
+
+  function handleSelectGate(gate) {
+    const mode = selectedTransportMode;
+    if (!mode || !selectedPlace) return;
+    setNavigateTo({ ...selectedPlace, mode, gate });
+    setSelectedPlace(null);
+    setShowGatePicker(false);
+    setSelectedTransportMode(null);
     setQuery("");
     setShowProfile(false);
     setActiveTab("Explore");
@@ -264,8 +288,8 @@ export default function FindMyClassApp() {
             <button
               type="button"
               className="btn-start-route"
-              onClick={() => handleNavigate(selectedPlace)}
-              aria-label={`Mulai rute ke ${selectedPlace.name}`}
+              onClick={() => setShowTransportModal(true)}
+              aria-label={`Pilih moda rute ke ${selectedPlace.name}`}
             >
               <span aria-hidden="true">➔</span>
               <span>Mulai Rute</span>
@@ -279,6 +303,113 @@ export default function FindMyClassApp() {
               <span aria-hidden="true">{savedPlaces.some((p) => p.name === selectedPlace.name) ? "★" : "♡"}</span>
               <span>{savedPlaces.some((p) => p.name === selectedPlace.name) ? "Tersimpan" : "Simpan"}</span>
             </button>
+          </div>
+        </section>
+      )}
+
+      {/* Modal / Dialog Pemilihan Moda Transportasi Kampus */}
+      {selectedPlace && showTransportModal && !navigateTo && (
+        <section className="transport-modal-card" role="dialog" aria-label="Pilih Moda Transportasi">
+          <div className="transport-modal-header">
+            <div>
+              <span className="place-kind-badge">Opsi Perjalanan</span>
+              <h3 className="place-name">Pilih Moda Kendaraan</h3>
+              <p className="place-address">Tujuan: <strong>{selectedPlace.name}</strong></p>
+            </div>
+            <button
+              type="button"
+              className="place-close-btn"
+              onClick={() => setShowTransportModal(false)}
+              aria-label="Tutup pemilihan kendaraan"
+            >
+              ×
+            </button>
+          </div>
+          <div className="transport-options-list">
+            <button
+              type="button"
+              className="transport-option-btn"
+              onClick={() => handleNavigate(selectedPlace, "walk")}
+            >
+              <span className="transport-icon">🚶</span>
+              <div className="transport-info">
+                <strong>Jalan Kaki</strong>
+                <span>Rute pedestrian kampus</span>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              className="transport-option-btn"
+              onClick={() => handleNavigate(selectedPlace, "motor")}
+            >
+              <span className="transport-icon">🏍️</span>
+              <div className="transport-info">
+                <strong>Motor Pribadi</strong>
+                <span>Wajib parkir samping Sport Center</span>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              className="transport-option-btn"
+              onClick={() => handleNavigate(selectedPlace, "car")}
+            >
+              <span className="transport-icon">🚗</span>
+              <div className="transport-info">
+                <strong>Mobil Pribadi</strong>
+                <span>Wajib parkir mobil samping Sport Center</span>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              className="transport-option-btn"
+              onClick={() => handleNavigate(selectedPlace, "beam")}
+            >
+              <span className="transport-icon">⚡</span>
+              <div className="transport-info">
+                <strong>Motor Listrik BEAM</strong>
+                <span>Bebas lawan arah / lewat Sport Center</span>
+              </div>
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* Gate Picker Modal (for Motor/Mobil Pribadi) */}
+      {selectedPlace && showGatePicker && !navigateTo && (
+        <section className="transport-modal-card" role="dialog" aria-label="Pilih Gerbang Masuk">
+          <div className="transport-modal-header">
+            <div>
+              <span className="place-kind-badge">Gerbang Masuk</span>
+              <h3 className="place-name">Pilih Gerbang Masuk Kampus</h3>
+              <p className="place-address">Moda: <strong>{selectedTransportMode === "motor" ? "Motor Pribadi" : "Mobil Pribadi"}</strong> → Parkir di Sport Center</p>
+            </div>
+            <button
+              type="button"
+              className="place-close-btn"
+              onClick={() => setShowGatePicker(false)}
+              aria-label="Tutup pemilihan gerbang"
+            >
+              ×
+            </button>
+          </div>
+          <div className="transport-options-list">
+            {CAMPUS_PLACES.filter((p) => p.kind === "Gate").map((gate) => (
+              <button
+                key={gate.name}
+                type="button"
+                className="transport-option-btn"
+                onClick={() => handleSelectGate(gate)}
+              >
+                <span className="transport-icon">🚪</span>
+                <div className="transport-info">
+                  <strong>{gate.name}</strong>
+                  <span>Masuk via {gate.name}</span>
+                </div>
+              </button>
+            ))}
           </div>
         </section>
       )}

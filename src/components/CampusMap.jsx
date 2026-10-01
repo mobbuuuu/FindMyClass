@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback, useImperativeHandle, forwardRef } from "react";
 import "leaflet/dist/leaflet.css";
 import { CAMPUS_ROAD_NODES, CAMPUS_ROAD_EDGES } from "../data/campusGraphData.js";
+import { buildMultimodalRoute, PARKING_LOCATIONS, GATE_LOCATIONS, fetchOSRMRoute } from "../utils/multimodalRouter.js";
 
 const TELKOM_UNIVERSITY = [-6.9747, 107.6301];
 const TELKOM_BOUNDARY = [
@@ -65,6 +66,10 @@ export const CAMPUS_PLACES = [
   { name: "Gate 3", position: [-6.974003, 107.632496], kind: "Gate", address: "2JGM+C26, Jl. Telekomunikasi, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257" },
   { name: "Gate 4", position: [-6.976102, 107.632827], kind: "Gate", address: "Jl. Sukabirus No.72, Sukapura, Kec. Dayeuhkolot, Kota Bandung, Jawa Barat 40257" },
   { name: "Gate 5", position: [-6.975225, 107.628982], kind: "Gate", address: "2JFH+WH5, Jl. Radio Palasari Road, Citeureup, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257" },
+
+  // Parkiran Kendaraan Kampus
+  { name: "Parkiran Motor (Sport Center)", position: [-6.9716666667, 107.6295555556], kind: "Building", address: "Samping Sport Center Telkom University" },
+  { name: "Parkiran Mobil (Sport Center)", position: [-6.9722222222, 107.6295555556], kind: "Building", address: "Sebelah Parkiran Motor Sport Center" },
 ];
 
 export { CAMPUS_ROAD_NODES, CAMPUS_ROAD_EDGES };
@@ -295,6 +300,8 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
   const headingMarker = useRef(null);
   const routeLine = useRef(null);
   const destMarker = useRef(null);
+  const parkingMarker = useRef(null);
+  const gateMarker = useRef(null);
   const userPos = useRef(null);
   const watchId = useRef(null);
   const headingListenerRef = useRef(null);
@@ -311,10 +318,21 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
 
   // Clean route layers
   const clearRoute = useCallback(() => {
-    routeLine.current?.remove();
-    routeLine.current = null;
+    // Remove main route line and any extra legs
+    if (routeLine.current) {
+      routeLine.current.remove();
+      if (routeLine.current._extraLegs) {
+        routeLine.current._extraLegs.forEach((leg) => leg.remove());
+      }
+      routeLine.current = null;
+    }
     destMarker.current?.remove();
     destMarker.current = null;
+    parkingMarker.current?.remove();
+    parkingMarker.current = null;
+    gateMarker.current?.remove();
+    gateMarker.current = null;
+    parkingMarker.current = null;
     headingMarker.current?.remove();
     headingMarker.current = null;
     if (activeMarkerRef.current) {
@@ -500,38 +518,82 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
 
           clearRoute();
 
-          // Calculate route following campus roads
-          let routeCoords = findCampusRoute(from, to);
+          // Calculate multimodal route with legs
+          const mode = navigateTo.mode || "walk";
+          const entryGate = navigateTo.gate || null;
+          const routeResult = await buildMultimodalRoute(from, to, mode, findCampusRoute, entryGate);
 
-          // Fallback to OSRM if off-campus or no route found
-          if (!routeCoords || routeCoords.length < 2) {
-            try {
-              const url = `https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${to[1]},${to[0]}?overview=full&geometries=geojson&alternatives=false`;
-              const res = await fetch(url);
-              const data = await res.json();
-              if (data.routes?.[0]) {
-                routeCoords = data.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
-              }
-            } catch { /* use straight line fallback */ }
-          }
+          const { coords: routeCoords, legs, parkingUsed, entryGateUsed } = routeResult;
 
+          // Fallback if no route coords
           if (!routeCoords || routeCoords.length < 2) {
             routeCoords = [from, to];
           }
 
-          // Draw route following road network with animated flow
-          routeLine.current = L.polyline(routeCoords, {
-            color: "#c45030",
-            weight: 5,
-            opacity: 0.9,
-            dashArray: "10 8",
-            lineCap: "round",
-            className: "animated-route-line",
-          }).addTo(map.current);
+          // Draw each leg with different styling
+          if (legs && legs.length > 0) {
+            legs.forEach((leg, idx) => {
+              const isDrive = leg.mode === "drive";
+              const isLast = idx === legs.length - 1;
+              const polyline = L.polyline(leg.coords, {
+                color: isDrive ? "#3b82f6" : "#c45030",
+                weight: 5,
+                opacity: 0.9,
+                dashArray: isDrive ? undefined : "10 8",
+                lineCap: "round",
+                className: "animated-route-line",
+              }).addTo(map.current);
+              // Store for cleanup - we'll use routeLine for the first leg, create refs for others
+              if (idx === 0) {
+                routeLine.current = polyline;
+              } else {
+                // Store additional polylines on routeLine as array
+                if (!routeLine.current._extraLegs) routeLine.current._extraLegs = [];
+                routeLine.current._extraLegs.push(polyline);
+              }
+            });
+          } else {
+            // Single polyline fallback
+            routeLine.current = L.polyline(routeCoords, {
+              color: mode === "motor" || mode === "car" ? "#255d6e" : "#c45030",
+              weight: 5,
+              opacity: 0.9,
+              dashArray: "10 8",
+              lineCap: "round",
+              className: "animated-route-line",
+            }).addTo(map.current);
+          }
 
           // User location marker with radar pulse
           if (locationMarker.current) locationMarker.current.remove();
           locationMarker.current = createUserMarker(L, from, "Kamu di sini").addTo(map.current).openPopup();
+
+          // Entry gate marker if applicable
+          if (entryGateUsed) {
+            const gIcon = L.divIcon({
+              className: "gate-location-pin",
+              html: `<div style="background:#3b82f6;color:white;font-weight:bold;border-radius:50%;width:28px;height:28px;display:grid;place-items:center;border:2px solid white;box-shadow:0 3px 8px rgba(0,0,0,0.3);font-size:12px;">🚪</div>`,
+              iconSize: [28, 28],
+              iconAnchor: [14, 14],
+            });
+            if (!gateMarker) gateMarker = { current: null };
+            gateMarker.current = L.marker(entryGateUsed.position, { icon: gIcon, zIndexOffset: 960 })
+              .addTo(map.current)
+              .bindPopup(`<strong>${entryGateUsed.name}</strong><br/>Gerbang masuk kendaraan.`);
+          }
+
+          // Parking marker if applicable
+          if (parkingUsed) {
+            const pIcon = L.divIcon({
+              className: "parking-location-pin",
+              html: `<div style="background:#255d6e;color:white;font-weight:bold;border-radius:50%;width:28px;height:28px;display:grid;place-items:center;border:2px solid white;box-shadow:0 3px 8px rgba(0,0,0,0.3);font-size:12px;">🅿️</div>`,
+              iconSize: [28, 28],
+              iconAnchor: [14, 14],
+            });
+            parkingMarker.current = L.marker(parkingUsed.position, { icon: pIcon, zIndexOffset: 950 })
+              .addTo(map.current)
+              .bindPopup(`<strong>${parkingUsed.name}</strong><br/>Parkir kendaraan di sini, lanjut jalan kaki.`);
+          }
 
           // Destination marker with animated glow
           destMarker.current = createDestinationMarker(L, to, navigateTo.name, "Tujuanmu").addTo(map.current);
@@ -540,17 +602,24 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
           const bounds = L.latLngBounds(routeCoords);
           map.current.fitBounds(bounds, { padding: [60, 60], maxZoom: 18 });
 
-          // Calculate true walking distance along route segments
+          // Calculate total distance (sum of all legs)
           let totalDist = 0;
           for (let i = 0; i < routeCoords.length - 1; i++) {
             totalDist += map.current.distance(L.latLng(routeCoords[i]), L.latLng(routeCoords[i + 1]));
           }
           const nextStep = routeCoords[1] || to;
           const bearing = bearingTo(from, nextStep);
+
+          // Build descriptive nav info
+          let destLabel = navigateTo.name;
+          const parts = [];
+          if (entryGateUsed) parts.push(`Gerbang: ${entryGateUsed.name}`);
+          if (parkingUsed) parts.push(`Parkir: ${parkingUsed.name}`);
+          parts.push("Jalan kaki ke tujuan");
           setNavInfo({
             distance: totalDist < 1000 ? `${Math.round(totalDist)} m` : `${(totalDist / 1000).toFixed(1)} km`,
             bearing: Math.round(bearing),
-            destName: navigateTo.name,
+            destName: parts.join(" → "),
           });
           setLocationMessage("");
         },
