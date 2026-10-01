@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback, useImperativeHandle, forwardRef } from "react";
 import "leaflet/dist/leaflet.css";
+import { CAMPUS_ROAD_NODES, CAMPUS_ROAD_EDGES } from "../data/campusGraphData.js";
 
 const TELKOM_UNIVERSITY = [-6.9747, 107.6301];
 const TELKOM_BOUNDARY = [
@@ -66,196 +67,100 @@ export const CAMPUS_PLACES = [
   { name: "Gate 5", position: [-6.975225, 107.628982], kind: "Gate", address: "2JFH+WH5, Jl. Radio Palasari Road, Citeureup, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257" },
 ];
 
-/** Campus road and walkway network nodes [lat, lng] — synced to CAMPUS_PLACES */
-const CAMPUS_GRAPH_NODES = {
-  // Asrama Putra internal grid
-  asrama_putra: [-6.9711944444, 107.6287777778],
-  asrama_p_nw: [-6.9710, 107.6285],
-  asrama_p_g5: [-6.9712, 107.6288],
-  asrama_p_g2: [-6.9712, 107.6293],
-  asrama_p_mid_w: [-6.9717, 107.6285],
-  asrama_p_mid_c: [-6.9717, 107.6288],
-  asrama_p_mid_e: [-6.9717, 107.6293],
-  asrama_p_sw: [-6.97218, 107.6285],
-  asrama_p_sc: [-6.97218, 107.6288],
-  asrama_tj_mart: [-6.97218, 107.62935],
+export { CAMPUS_ROAD_NODES, CAMPUS_ROAD_EDGES };
 
-  // TULT (North)
-  tult: [-6.968949, 107.628111],
-  road_tult_approach: [-6.9698, 107.6282],
-  road_north_gate: [-6.9708, 107.6283],
+/** Ray-casting algorithm to determine if a coordinate is within a polygon boundary */
+function isInsidePolygon(point, vs) {
+  const x = point[0];
+  const y = point[1];
+  let inside = false;
+  for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+    const xi = vs[i][0];
+    const yi = vs[i][1];
+    const xj = vs[j][0];
+    const yj = vs[j][1];
+    const intersect = ((yi > y) !== (yj > y)) && (x < ((xj - xi) * (y - yi)) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
 
-  // Northern Ring Road (TJ Mart -> TUCH -> FEB -> Gate 1)
-  road_sc_north: [-6.97218, 107.62970],
-  road_btp_junc: [-6.97215, 107.63030],
-  road_tuch_north: [-6.97185, 107.63095],
-  tuch: [-6.9712777778, 107.6312222222],
-  road_feb_north: [-6.97150, 107.63170],
-  feb: [-6.971336184403436, 107.631943572998],
-  road_feb_corner: [-6.97135, 107.63215],
-  road_gate1_approach: [-6.97180, 107.63290],
-  gate1: [-6.972076, 107.633449],
+// Pre-classify all road nodes: 1 if inside campus boundary, 0 if outside
+const IS_INSIDE_ROAD_NODE = new Uint8Array(CAMPUS_ROAD_NODES.length);
+for (let i = 0; i < CAMPUS_ROAD_NODES.length; i++) {
+  if (isInsidePolygon(CAMPUS_ROAD_NODES[i], TELKOM_BOUNDARY)) {
+    IS_INSIDE_ROAD_NODE[i] = 1;
+  }
+}
 
-  // Eastern Ring Road (Gate 1 -> FKS -> Gate 2 -> FIT -> Gate 3 -> Gate 4)
-  road_fks_front: [-6.97205, 107.63285],
-  fks: [-6.972002173916829, 107.63281880706629],
-  library: [-6.971760334262225, 107.6324196103809],
-  road_fks_south: [-6.97260, 107.63280],
-  gate2_junc: [-6.97310, 107.63280],
-  gate2: [-6.973109, 107.633289],
-  fit: [-6.9731944444, 107.6326666667],
-  road_fit_front: [-6.97355, 107.63270],
-  gate3: [-6.974003, 107.632496],
-  road_east_south: [-6.97480, 107.63240],
-  road_masjid_east: [-6.97550, 107.63240],
-  gate4: [-6.976102, 107.632827],
+// Pre-build internal-only adjacency graph so campus navigation never exits perimeter
+const INTERNAL_ROAD_ADJACENCY = Array.from({ length: CAMPUS_ROAD_NODES.length }, () => []);
+for (let i = 0; i < CAMPUS_ROAD_EDGES.length; i++) {
+  const [u, v] = CAMPUS_ROAD_EDGES[i];
+  if (IS_INSIDE_ROAD_NODE[u] && IS_INSIDE_ROAD_NODE[v]) {
+    const p1 = CAMPUS_ROAD_NODES[u];
+    const p2 = CAMPUS_ROAD_NODES[v];
+    const dLat = p1[0] - p2[0];
+    const dLon = (p1[1] - p2[1]) * Math.cos(((p1[0] + p2[0]) / 2) * Math.PI / 180);
+    const dist = Math.sqrt(dLat * dLat + dLon * dLon);
+    INTERNAL_ROAD_ADJACENCY[u].push({ to: v, dist });
+    INTERNAL_ROAD_ADJACENCY[v].push({ to: u, dist });
+  }
+}
 
-  // FIK & East of Danau Galau
-  road_fik_front: [-6.97185, 107.63155],
-  fik: [-6.9717777778, 107.6315000000],
-  road_danau_east: [-6.97310, 107.63170],
-  danau_galau: [-6.9731666667, 107.6312777778],
-  road_danau_se: [-6.97360, 107.63150],
-
-  // West road along Sport Center & Asrama Putri
-  sport_center: [-6.97245, 107.6289],
-  road_sc_south: [-6.97260, 107.62935],
-  road_ku3_west: [-6.97290, 107.62940],
-  telu_coffee: [-6.9731388889, 107.6293055556],
-  road_asrama_putri_junc: [-6.97350, 107.62940],
-  asrama_putri: [-6.9743055556, 107.6290555556],
-  foodcourt_putri: [-6.9741944444, 107.6292777778],
-  kantin_putri: [-6.974439793270318, 107.6287960878003],
-  road_gate5_approach: [-6.97490, 107.62900],
-  gate5: [-6.975225, 107.628982],
-
-  // Central KU3 Plaza & Around Danau Galau
-  gku3: [-6.972866066219806, 107.6298691237254],
-  road_ku3_north: [-6.97265, 107.62990],
-  road_ku3_east: [-6.97290, 107.63030],
-  road_poliklinik: [-6.97350, 107.63030],
-  telkom_univ: [-6.9729166667, 107.6300000000],
-  road_danau_south: [-6.97365, 107.63090],
-
-  // Central Boulevard towards Gate 3 & South Campus
-  road_rektorat_roundabout: [-6.97400, 107.63050],
-  road_boulevard_to_gate3: [-6.97400, 107.63170],
-  road_gku1: [-6.97440, 107.63050],
-  gku1: [-6.974390859546471, 107.63106844734378],
-  road_gku2: [-6.97485, 107.63050],
-  gku2: [-6.9748408361847485, 107.63105842897347],
-  road_fte: [-6.97545, 107.63010],
-  fte: [-6.975473686188717, 107.6295071364736],
-  road_fif: [-6.97580, 107.63050],
-  fif: [-6.9758309689279425, 107.63069039465188],
-  road_gsg: [-6.97635, 107.63030],
-  gsg: [-6.9763885581062715, 107.63028949108872],
-  road_masjid: [-6.97570, 107.63210],
-  masjid: [-6.975699272034128, 107.6321904194122],
-};
-
-/** Connected walkway segments across campus — strictly following real roads & paths */
-const CAMPUS_GRAPH_EDGES = [
-  // Asrama Putra internal walkways
-  ["asrama_putra", "asrama_p_g5"],
-  ["asrama_p_nw", "asrama_p_g5"],
-  ["asrama_p_g5", "asrama_p_g2"],
-  ["asrama_p_nw", "asrama_p_mid_w"],
-  ["asrama_p_g5", "asrama_p_mid_c"],
-  ["asrama_p_g2", "asrama_p_mid_e"],
-  ["asrama_p_mid_w", "asrama_p_mid_c"],
-  ["asrama_p_mid_c", "asrama_p_mid_e"],
-  ["asrama_p_mid_w", "asrama_p_sw"],
-  ["asrama_p_mid_c", "asrama_p_sc"],
-  ["asrama_p_mid_e", "asrama_tj_mart"],
-  ["asrama_p_sw", "asrama_p_sc"],
-  ["asrama_p_sc", "asrama_tj_mart"],
-
-  // North to TULT
-  ["asrama_p_nw", "road_north_gate"],
-  ["road_north_gate", "road_tult_approach"],
-  ["road_tult_approach", "tult"],
-
-  // Northern Ring Road (TJ Mart -> TUCH -> FEB -> Gate 1)
-  ["asrama_tj_mart", "road_sc_north"],
-  ["road_sc_north", "road_btp_junc"],
-  ["road_btp_junc", "road_tuch_north"],
-  ["road_tuch_north", "tuch"],
-  ["road_tuch_north", "road_feb_north"],
-  ["road_feb_north", "feb"],
-  ["road_feb_north", "road_feb_corner"],
-  ["road_feb_corner", "road_gate1_approach"],
-  ["road_gate1_approach", "gate1"],
-  ["road_gate1_approach", "road_fks_front"],
-
-  // Eastern Ring Road (Gate 1 -> FKS -> Gate 2 -> FIT -> Gate 3 -> Gate 4)
-  ["road_fks_front", "fks"],
-  ["road_fks_front", "library"],
-  ["road_fks_front", "road_fks_south"],
-  ["road_fks_south", "gate2_junc"],
-  ["gate2_junc", "gate2"],
-  ["gate2_junc", "fit"],
-  ["gate2_junc", "road_fit_front"],
-  ["road_fit_front", "gate3"],
-  ["gate3", "road_east_south"],
-  ["road_east_south", "road_masjid_east"],
-  ["road_masjid_east", "gate4"],
-  ["road_masjid_east", "road_masjid"],
-
-  // FIK and East of Danau Galau
-  ["road_tuch_north", "road_fik_front"],
-  ["road_fik_front", "fik"],
-  ["road_fik_front", "road_fks_front"],
-  ["road_fik_front", "road_danau_east"],
-  ["road_danau_east", "road_fks_south"],
-  ["road_danau_east", "road_fit_front"],
-  ["road_danau_east", "danau_galau"],
-  ["road_danau_east", "road_danau_se"],
-  ["road_danau_se", "road_boulevard_to_gate3"],
-
-  // West road along Sport Center & Asrama Putri
-  ["asrama_tj_mart", "road_sc_south"],
-  ["sport_center", "road_sc_north"],
-  ["sport_center", "road_sc_south"],
-  ["road_sc_south", "road_ku3_west"],
-  ["road_ku3_west", "telu_coffee"],
-  ["road_ku3_west", "road_asrama_putri_junc"],
-  ["road_asrama_putri_junc", "asrama_putri"],
-  ["road_asrama_putri_junc", "foodcourt_putri"],
-  ["road_asrama_putri_junc", "kantin_putri"],
-  ["road_asrama_putri_junc", "road_gate5_approach"],
-  ["road_gate5_approach", "gate5"],
-
-  // Central KU3 Plaza & South of Danau Galau
-  ["road_sc_south", "road_ku3_north"],
-  ["road_ku3_north", "gku3"],
-  ["road_ku3_north", "road_ku3_east"],
-  ["road_ku3_west", "gku3"],
-  ["road_ku3_east", "telkom_univ"],
-  ["road_ku3_east", "road_poliklinik"],
-  ["road_asrama_putri_junc", "road_poliklinik"],
-  ["road_poliklinik", "road_rektorat_roundabout"],
-  ["road_poliklinik", "road_danau_south"],
-  ["road_danau_south", "road_danau_se"],
-  ["road_danau_south", "road_rektorat_roundabout"],
-
-  // Central Boulevard to Gate 3 & South Campus
-  ["road_rektorat_roundabout", "road_boulevard_to_gate3"],
-  ["road_boulevard_to_gate3", "gate3"],
-  ["road_rektorat_roundabout", "road_gku1"],
-  ["road_gku1", "gku1"],
-  ["road_gku1", "road_gku2"],
-  ["road_gku2", "gku2"],
-  ["road_gku2", "road_fte"],
-  ["road_fte", "fte"],
-  ["road_fte", "road_fif"],
-  ["road_fif", "fif"],
-  ["road_fif", "road_gsg"],
-  ["road_gsg", "gsg"],
-  ["road_fte", "road_gate5_approach"],
-  ["road_fif", "road_masjid"],
-  ["road_masjid", "masjid"],
-];
+/** MinHeap priority queue for sub-millisecond Dijkstra pathfinding */
+class MinHeap {
+  constructor() {
+    this.heap = [];
+  }
+  push(node, val) {
+    this.heap.push({ node, val });
+    this._up(this.heap.length - 1);
+  }
+  pop() {
+    if (this.heap.length === 0) return null;
+    const top = this.heap[0];
+    const bottom = this.heap.pop();
+    if (this.heap.length > 0) {
+      this.heap[0] = bottom;
+      this._down(0);
+    }
+    return top;
+  }
+  isEmpty() {
+    return this.heap.length === 0;
+  }
+  _up(i) {
+    while (i > 0) {
+      const p = (i - 1) >> 1;
+      if (this.heap[p].val > this.heap[i].val) {
+        const tmp = this.heap[p];
+        this.heap[p] = this.heap[i];
+        this.heap[i] = tmp;
+        i = p;
+      } else {
+        break;
+      }
+    }
+  }
+  _down(i) {
+    const len = this.heap.length;
+    while ((i << 1) + 1 < len) {
+      let left = (i << 1) + 1;
+      let right = left + 1;
+      let best = left;
+      if (right < len && this.heap[right].val < this.heap[left].val) best = right;
+      if (this.heap[best].val < this.heap[i].val) {
+        const tmp = this.heap[best];
+        this.heap[best] = this.heap[i];
+        this.heap[i] = tmp;
+        i = best;
+      } else {
+        break;
+      }
+    }
+  }
+}
 
 function distBetween([lat1, lng1], [lat2, lng2]) {
   const dLat = lat1 - lat2;
@@ -263,91 +168,77 @@ function distBetween([lat1, lng1], [lat2, lng2]) {
   return Math.sqrt(dLat * dLat + dLng * dLng);
 }
 
-function findNearestNode(point) {
-  let nearest = null;
+function findNearestInsideRoadNode(point) {
+  let nearest = -1;
   let minDist = Infinity;
-  for (const [id, coords] of Object.entries(CAMPUS_GRAPH_NODES)) {
-    const d = distBetween(point, coords);
+  for (let i = 0; i < CAMPUS_ROAD_NODES.length; i++) {
+    if (!IS_INSIDE_ROAD_NODE[i]) continue;
+    const d = distBetween(point, CAMPUS_ROAD_NODES[i]);
     if (d < minDist) {
       minDist = d;
-      nearest = id;
+      nearest = i;
     }
   }
   return { id: nearest, dist: minDist };
 }
 
+/**
+ * Calculates shortest walking route strictly following campus paved roads and footpaths.
+ * Confined 100% within the campus boundary to keep routes on internal walkways.
+ */
 function findCampusRoute(from, to) {
-  const start = findNearestNode(from);
-  const end = findNearestNode(to);
-  if (!start.id || !end.id) return null;
+  const start = findNearestInsideRoadNode(from);
+  const end = findNearestInsideRoadNode(to);
+  if (start.id === -1 || end.id === -1) return null;
   // If either point is too far from campus (> ~1.5 km), don't use campus graph
   if (start.dist > 0.015 || end.dist > 0.015) return null;
 
-  // Adjacency list
-  const adj = {};
-  for (const id of Object.keys(CAMPUS_GRAPH_NODES)) {
-    adj[id] = [];
-  }
-  for (const [u, v] of CAMPUS_GRAPH_EDGES) {
-    if (CAMPUS_GRAPH_NODES[u] && CAMPUS_GRAPH_NODES[v]) {
-      const w = distBetween(CAMPUS_GRAPH_NODES[u], CAMPUS_GRAPH_NODES[v]);
-      adj[u].push({ node: v, weight: w });
-      adj[v].push({ node: u, weight: w });
-    }
-  }
+  const N = CAMPUS_ROAD_NODES.length;
+  const dist = new Float64Array(N).fill(Infinity);
+  const prev = new Int32Array(N).fill(-1);
+  const heap = new MinHeap();
 
-  // Dijkstra
-  const dist = {};
-  const prev = {};
-  const unvisited = new Set(Object.keys(CAMPUS_GRAPH_NODES));
-  for (const id of Object.keys(CAMPUS_GRAPH_NODES)) {
-    dist[id] = Infinity;
-  }
   dist[start.id] = 0;
+  heap.push(start.id, 0);
 
-  while (unvisited.size > 0) {
-    let curr = null;
-    let minD = Infinity;
-    for (const node of unvisited) {
-      if (dist[node] < minD) {
-        minD = dist[node];
-        curr = node;
-      }
-    }
-    if (curr === null || dist[curr] === Infinity || curr === end.id) break;
-    unvisited.delete(curr);
+  while (!heap.isEmpty()) {
+    const { node, val } = heap.pop();
+    if (val > dist[node]) continue;
+    if (node === end.id) break;
 
-    for (const edge of adj[curr]) {
-      if (unvisited.has(edge.node)) {
-        const alt = dist[curr] + edge.weight;
-        if (alt < dist[edge.node]) {
-          dist[edge.node] = alt;
-          prev[edge.node] = curr;
-        }
+    const edges = INTERNAL_ROAD_ADJACENCY[node];
+    for (let i = 0; i < edges.length; i++) {
+      const edge = edges[i];
+      const alt = val + edge.dist;
+      if (alt < dist[edge.to]) {
+        dist[edge.to] = alt;
+        prev[edge.to] = node;
+        heap.push(edge.to, alt);
       }
     }
   }
 
   if (dist[end.id] === Infinity) return null;
 
-  // Reconstruct path
+  // Reconstruct path along real paved roads inside campus
   const path = [];
-  let u = end.id;
-  while (u) {
-    path.unshift(CAMPUS_GRAPH_NODES[u]);
-    u = prev[u];
+  let cur = end.id;
+  while (cur !== -1) {
+    path.push(CAMPUS_ROAD_NODES[cur]);
+    cur = prev[cur];
   }
+  path.reverse();
 
-  // Assemble full path: from -> nodes -> to
+  // Assemble full path: from -> road nodes -> to
   const raw = [from, ...path, to];
-  // Deduplicate consecutive points that are extremely close
+  // Deduplicate consecutive points that are extremely close (< ~1 meter)
   const cleaned = [];
   for (let i = 0; i < raw.length; i++) {
     if (cleaned.length === 0) {
       cleaned.push(raw[i]);
     } else {
       const prevPt = cleaned[cleaned.length - 1];
-      if (distBetween(prevPt, raw[i]) > 0.00003) {
+      if (distBetween(prevPt, raw[i]) > 0.00001) {
         cleaned.push(raw[i]);
       }
     }
@@ -369,13 +260,35 @@ function bearingTo([lat1, lng1], [lat2, lng2]) {
 function createArrowIcon(L, heading) {
   return L.divIcon({
     className: "heading-arrow",
-    html: `<div style="transform:rotate(${heading}deg);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:18px solid #e36f54;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))"></div>`,
+    html: `<div style="transform:rotate(${heading}deg);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:18px solid #c45030;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))"></div>`,
     iconSize: [16, 18],
     iconAnchor: [8, 18],
   });
 }
 
-const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd }, ref) {
+/** Create pulsating user location marker */
+function createUserMarker(L, position, popupText) {
+  const icon = L.divIcon({
+    className: "user-location-pin",
+    html: `<div class="user-pulse-ring"></div><div class="user-pulse-ring-inner"></div><div class="user-pin-dot"></div>`,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+  });
+  return L.marker(position, { icon, zIndexOffset: 1000 }).bindPopup(`<strong>${popupText}</strong>`);
+}
+
+/** Create glowing destination marker */
+function createDestinationMarker(L, position, title, subtitle) {
+  const icon = L.divIcon({
+    className: "dest-location-pin",
+    html: `<div class="dest-pin-glow"></div><div class="dest-pin-dot"></div>`,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+  });
+  return L.marker(position, { icon, zIndexOffset: 900 }).bindPopup(`<strong>${title}</strong><br/>${subtitle}`);
+}
+
+const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, onSelectPlace }, ref) {
   const mapElement = useRef(null);
   const map = useRef(null);
   const locationMarker = useRef(null);
@@ -385,8 +298,16 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd },
   const userPos = useRef(null);
   const watchId = useRef(null);
   const headingListenerRef = useRef(null);
+  const onSelectPlaceRef = useRef(onSelectPlace);
+  const placeMarkersRef = useRef({});
+  const activeMarkerRef = useRef(null);
   const [locationMessage, setLocationMessage] = useState("");
+  const [isLocating, setIsLocating] = useState(false);
   const [navInfo, setNavInfo] = useState(null); // { distance, bearing, destName }
+
+  useEffect(() => {
+    onSelectPlaceRef.current = onSelectPlace;
+  });
 
   // Clean route layers
   const clearRoute = useCallback(() => {
@@ -396,10 +317,27 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd },
     destMarker.current = null;
     headingMarker.current?.remove();
     headingMarker.current = null;
+    if (activeMarkerRef.current) {
+      activeMarkerRef.current.setStyle({ radius: 7, fillColor: "#255d6e", weight: 2 });
+      activeMarkerRef.current = null;
+    }
     setNavInfo(null);
   }, []);
 
-  useImperativeHandle(ref, () => ({ clearRoute }), [clearRoute]);
+  const panToPlace = useCallback((place) => {
+    if (!map.current || !place?.position) return;
+    map.current.flyTo(place.position, 17, { duration: 0.8 });
+
+    if (activeMarkerRef.current && activeMarkerRef.current !== placeMarkersRef.current[place.name]) {
+      activeMarkerRef.current.setStyle({ radius: 7, fillColor: "#255d6e", weight: 2 });
+    }
+    const marker = placeMarkersRef.current[place.name];
+    if (marker) {
+      marker.setStyle({ radius: 10, fillColor: "#c45030", weight: 3 });
+      marker.openTooltip();
+      activeMarkerRef.current = marker;
+    }
+  }, []);
 
   // Init map
   useEffect(() => {
@@ -413,6 +351,7 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd },
         center: TELKOM_UNIVERSITY,
         zoom: 16,
         zoomControl: false,
+        dragging: true,
         scrollWheelZoom: true,
         touchZoom: true,
         doubleClickZoom: true,
@@ -425,26 +364,39 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd },
       }).addTo(campusMap);
 
       L.polygon(TELKOM_BOUNDARY, {
-        color: "#e36f54",
+        color: "#c45030",
         weight: 3,
         opacity: 0.95,
-        fillColor: "#f39a7d",
-        fillOpacity: 0.08,
+        fillColor: "#c45030",
+        fillOpacity: 0.06,
       }).addTo(campusMap).bindTooltip("Telkom University campus", { sticky: true });
       const campusBounds = L.latLngBounds(TELKOM_BOUNDARY);
       campusMap.fitBounds(campusBounds, { padding: [18, 18] });
-      campusMap.setMaxBounds(campusBounds.pad(0.08));
+      campusMap.setMaxBounds(campusBounds.pad(1.2));
+      campusMap.setMinZoom(14);
 
       CAMPUS_PLACES.forEach((place) => {
-        L.circleMarker(place.position, {
-          radius: 6,
+        const marker = L.circleMarker(place.position, {
+          radius: 7,
           color: "#ffffff",
           weight: 2,
-          fillColor: "#3388ff",
+          fillColor: "#255d6e",
           fillOpacity: 0.9,
         })
           .addTo(campusMap)
-          .bindPopup(`<strong>${place.name}</strong><br />${place.kind}`);
+          .bindTooltip(place.name, {
+            permanent: false,
+            direction: "top",
+            offset: [0, -8],
+            className: "campus-tooltip",
+          });
+
+        placeMarkersRef.current[place.name] = marker;
+
+        marker.on("click", (e) => {
+          L.DomEvent.stopPropagation(e);
+          onSelectPlaceRef.current?.(place);
+        });
       });
 
       map.current = campusMap;
@@ -455,6 +407,8 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd },
       campusMap?.remove();
       map.current = null;
       locationMarker.current = null;
+      placeMarkersRef.current = {};
+      activeMarkerRef.current = null;
       if (watchId.current != null) navigator.geolocation.clearWatch(watchId.current);
       if (headingListenerRef.current) {
         window.removeEventListener("deviceorientationabsolute", headingListenerRef.current);
@@ -470,13 +424,16 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd },
     watchId.current = navigator.geolocation.watchPosition(
       ({ coords }) => {
         userPos.current = [coords.latitude, coords.longitude];
+        if (locationMarker.current) {
+          locationMarker.current.setLatLng(userPos.current);
+        }
       },
       () => {},
       { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 },
     );
   }, []);
 
-  // Device heading listener — rotates heading arrow to show direction
+  // Rotates heading arrow to show compass direction
   useEffect(() => {
     function onOrientation(e) {
       // alpha = compass heading (0=north). webkitCompassHeading for iOS
@@ -562,33 +519,22 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd },
             routeCoords = [from, to];
           }
 
-          // Draw route following road network
+          // Draw route following road network with animated flow
           routeLine.current = L.polyline(routeCoords, {
-            color: "#e36f54",
+            color: "#c45030",
             weight: 5,
-            opacity: 0.85,
-            dashArray: "10 6",
+            opacity: 0.9,
+            dashArray: "10 8",
             lineCap: "round",
+            className: "animated-route-line",
           }).addTo(map.current);
 
-          // User location marker
+          // User location marker with radar pulse
           if (locationMarker.current) locationMarker.current.remove();
-          locationMarker.current = L.circleMarker(from, {
-            radius: 9,
-            color: "#ffffff",
-            weight: 3,
-            fillColor: "#e36f54",
-            fillOpacity: 1,
-          }).addTo(map.current).bindPopup("<strong>Kamu di sini</strong>").openPopup();
+          locationMarker.current = createUserMarker(L, from, "Kamu di sini").addTo(map.current).openPopup();
 
-          // Destination marker
-          destMarker.current = L.circleMarker(to, {
-            radius: 10,
-            color: "#ffffff",
-            weight: 3,
-            fillColor: "#4b8fa4",
-            fillOpacity: 1,
-          }).addTo(map.current).bindPopup(`<strong>${navigateTo.name}</strong><br/>Tujuanmu`);
+          // Destination marker with animated glow
+          destMarker.current = createDestinationMarker(L, to, navigateTo.name, "Tujuanmu").addTo(map.current);
 
           // Fit view to entire route with comfortable padding
           const bounds = L.latLngBounds(routeCoords);
@@ -617,9 +563,9 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd },
     navigate();
   }, [navigateTo, clearRoute, startWatchingPosition]);
 
-  function locateStudent() {
+  const locateStudent = useCallback(() => {
     if (!map.current || !navigator.geolocation) {
-      setLocationMessage("Location is not available in this browser.");
+      setLocationMessage("Lokasi tidak tersedia di peramban ini.");
       return;
     }
 
@@ -633,41 +579,61 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd },
     }
 
     startWatchingPosition();
-    setLocationMessage("Finding your location...");
+    setIsLocating(true);
+    setLocationMessage("Mencari lokasi kamu...");
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
         const studentPosition = [coords.latitude, coords.longitude];
         userPos.current = studentPosition;
         import("leaflet").then(({ default: L }) => {
+          setIsLocating(false);
           if (!map.current) return;
           if (locationMarker.current) locationMarker.current.remove();
           map.current.setView(studentPosition, 17);
-          locationMarker.current = L.circleMarker(studentPosition, {
-            radius: 9,
-            color: "#ffffff",
-            weight: 3,
-            fillColor: "#e36f54",
-            fillOpacity: 1,
-          }).addTo(map.current).bindPopup("<strong>You are here</strong>").openPopup();
-          setLocationMessage("Your location is shown on the map.");
+          locationMarker.current = createUserMarker(L, studentPosition, "Kamu di sini").addTo(map.current).openPopup();
+          setLocationMessage("Lokasi kamu ditampilkan di peta.");
         });
       },
-      () => setLocationMessage("We could not access your location. Check browser permissions."),
+      () => {
+        setIsLocating(false);
+        setLocationMessage("Tidak dapat mengakses lokasi. Periksa izin browser.");
+      },
       { enableHighAccuracy: true, timeout: 10000 },
     );
-  }
+  }, [startWatchingPosition]);
+
+  useImperativeHandle(ref, () => ({ clearRoute, panToPlace, locateStudent }), [clearRoute, panToPlace, locateStudent]);
 
   return (
     <div className="campus-map-shell">
-      <div ref={mapElement} className="campus-map" aria-label="OpenStreetMap of Telkom University" />
-      <div className="map-zoom-controls" aria-label="Map zoom controls">
-        <button type="button" onClick={() => map.current?.zoomIn()} aria-label="Zoom in">+</button>
-        <span />
-        <button type="button" onClick={() => map.current?.zoomOut()} aria-label="Zoom out">−</button>
-      </div>
-      <div className="map-overlay">
-        <div><strong>Telkom University</strong><span>Bandung campus</span></div>
-        <button type="button" onClick={locateStudent} aria-label="Show my location">◎</button>
+      <div ref={mapElement} className="campus-map" style={{ touchAction: "none" }} aria-label="Peta Kampus Telkom University" />
+      <div className="map-action-controls" aria-label="Kontrol navigasi peta">
+        <button
+          type="button"
+          onClick={() => map.current?.zoomIn()}
+          aria-label="Perbesar peta"
+          title="Perbesar"
+        >
+          +
+        </button>
+        <button
+          type="button"
+          onClick={() => map.current?.zoomOut()}
+          aria-label="Perkecil peta"
+          title="Perkecil"
+        >
+          −
+        </button>
+        <span className="control-divider" aria-hidden="true" />
+        <button
+          type="button"
+          onClick={locateStudent}
+          className={isLocating ? "locating" : ""}
+          aria-label="Lokasi saya saat ini"
+          title="Lokasi saya"
+        >
+          ⌖
+        </button>
       </div>
       {navInfo && (
         <div className="nav-info-bar" role="status">
