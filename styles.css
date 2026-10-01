@@ -277,13 +277,16 @@ body { overflow: hidden; }
 
 .search-toast {
   position: absolute;
-  z-index: 500;
+  z-index: 600;
   top: 154px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px 8px 18px;
   border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 12px;
+  border-radius: 14px;
   color: var(--ink);
   background: rgba(255, 254, 250, 0.94);
   box-shadow: 0 12px 30px rgba(34, 67, 75, 0.16);
@@ -293,6 +296,25 @@ body { overflow: hidden; }
   animation: toastPopUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 .search-toast strong { color: var(--deep-blue); }
+
+.toast-exit-btn {
+  border: 0;
+  background: rgba(196, 80, 48, 0.12);
+  color: var(--coral);
+  font-weight: 700;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+.toast-exit-btn:hover {
+  background: var(--coral);
+  color: white;
+}
 
 /* Custom Leaflet tooltips for campus place labels */
 .campus-tooltip {
@@ -523,8 +545,8 @@ body { overflow: hidden; }
 /* Navigation info bar */
 .nav-info-bar {
   position: absolute;
-  z-index: 500;
-  top: 24px;
+  z-index: 600;
+  bottom: max(24px, env(safe-area-inset-bottom, 24px));
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -537,7 +559,7 @@ body { overflow: hidden; }
   box-shadow: 0 12px 32px rgba(34, 67, 75, 0.18);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  animation: navInfoSlideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: placeCardSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 .nav-arrow {
   display: grid;

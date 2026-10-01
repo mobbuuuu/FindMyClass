@@ -391,7 +391,15 @@ export default function FindMyClassApp() {
 
       {navigateTo && (
         <div className="search-toast" role="status">
-          Navigasi aktif ke <strong>{navigateTo.name}</strong>
+          <span>Navigasi aktif ke <strong>{navigateTo.name}</strong></span>
+          <button
+            type="button"
+            className="toast-exit-btn"
+            onClick={handleNavigationEnd}
+            aria-label="Batalkan navigasi"
+          >
+            Akhiri ✕
+          </button>
         </div>
       )}
     </main>
