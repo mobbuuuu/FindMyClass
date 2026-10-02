@@ -9,6 +9,14 @@
   --yellow: #f5cc67;
   --line: #dce2df;
   --shadow: 0 16px 40px rgba(43, 65, 73, 0.1);
+
+  /* Apple-inspired timing tokens */
+  --ease-apple: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --spring-snappy: cubic-bezier(0.23, 1.0, 0.32, 1);
+  --duration-micro: 120ms;
+  --duration-short: 200ms;
+  --duration-medium: 350ms;
 }
 
 * { box-sizing: border-box; }
@@ -95,10 +103,23 @@ h1 em { color: var(--deep-blue); font-style: normal; }
 }
 .map-action-controls button:active {
   transform: scale(0.92);
+  transition: transform var(--duration-micro) var(--ease-apple);
 }
 .map-action-controls button.locating {
   color: var(--coral);
   animation: locatingPulse 1s ease-in-out infinite alternate;
+  position: relative;
+  overflow: hidden;
+}
+
+.locate-skeleton {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #e0e0e0 25%, #d0d0d0 50%, #e0e0e0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
 }
 @keyframes locatingPulse {
   from { transform: scale(1); opacity: 1; }
@@ -166,18 +187,32 @@ body { overflow: hidden; }
 .map-search { display: flex; align-items: center; flex: 1; min-width: 160px; gap: 9px; color: var(--muted); }
 .map-search > span { font-size: 23px; line-height: 1; transform: rotate(-15deg); }
 .map-search input { width: 100%; min-width: 0; border: 0; color: var(--ink); background: transparent; font-size: 13px; }
-.map-search input:focus-visible { outline: 2px solid var(--deep-blue); outline-offset: 2px; border-radius: 4px; }
+.map-search input {
+  transition: box-shadow var(--duration-short) var(--ease-apple);
+}
+.map-search input:focus-visible {
+  outline: 2px solid var(--deep-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 4px rgba(37, 93, 110, 0.12);
+}
 .map-search input::placeholder { color: var(--muted); }
 .clear-search { border: 0; color: var(--muted); background: transparent; min-width: 44px; min-height: 44px; display: grid; place-items: center; font-size: 19px; line-height: 1; border-radius: 8px; transition: color 0.15s ease; }
 .clear-search:hover { color: var(--ink); }
 .menu-tabs { display: flex; gap: 4px; }
 .menu-tab { display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 10px 14px; border: 0; border-radius: 12px; color: var(--muted); background: transparent; font-size: 12px; font-weight: 600; transition: all .2s cubic-bezier(0.16, 1, 0.3, 1); }
 .menu-tab:hover, .menu-tab.active { color: var(--ink); background: rgba(255,255,255,.75); box-shadow: 0 3px 10px rgba(34,67,75,.08); }
-.menu-tab:active { transform: scale(0.95); }
+.menu-tab:active {
+  transform: scale(0.95);
+  transition: transform var(--duration-micro) var(--ease-apple);
+}
 .tab-icon { font-size: 18px; line-height: 1; }
 .profile-button { display: grid; width: 44px; height: 44px; margin-left: 10px; place-items: center; border: 2px solid rgba(255,255,255,.9); border-radius: 50%; color: white; background: var(--deep-blue); font-size: 12px; font-weight: 700; transition: transform 0.2s ease, box-shadow 0.2s ease; }
 .profile-button:hover { transform: scale(1.06); box-shadow: 0 4px 12px rgba(37, 93, 110, 0.35); }
-.profile-button:active { transform: scale(0.94); }
+.profile-button:active {
+  transform: scale(0.94);
+  transition: transform var(--duration-micro) var(--ease-apple);
+}
 
 /* Category chips and places strip */
 .category-chips-bar {
@@ -216,9 +251,17 @@ body { overflow: hidden; }
   font-weight: 600;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
+.category-chip {
+  transition: all var(--duration-short) var(--ease-apple);
+}
 .category-chip:hover {
   color: var(--ink);
   background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
+}
+.category-chip:active {
+  transform: scale(0.96);
+  transition: transform var(--duration-micro) var(--ease-apple);
 }
 .category-chip.active {
   color: white;
@@ -322,6 +365,7 @@ body { overflow: hidden; }
 }
 .toast-exit-btn:active {
   transform: scale(0.96);
+  transition: transform var(--duration-micro) var(--ease-apple);
 }
 .toast-exit-btn:focus-visible {
   outline: 2px solid var(--deep-blue);
@@ -360,8 +404,15 @@ body { overflow: hidden; }
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   padding: 8px;
-  animation: dropdownPopUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: dropdownPopUp 0.25s var(--ease-out-expo) forwards;
 }
+
+/* Stagger delay for search result items via inline style --index */
+.search-result-item:nth-child(1) { animation-delay: 0ms; }
+.search-result-item:nth-child(2) { animation-delay: 40ms; }
+.search-result-item:nth-child(3) { animation-delay: 80ms; }
+.search-result-item:nth-child(4) { animation-delay: 120ms; }
+.search-result-item:nth-child(5) { animation-delay: 160ms; }
 .search-result-item {
   display: flex;
   align-items: center;
@@ -373,13 +424,21 @@ body { overflow: hidden; }
   background: transparent;
   text-align: left;
   color: var(--ink);
-  transition: background 0.15s ease, transform 0.15s ease;
+  transition: background var(--duration-short) var(--ease-apple), transform var(--duration-short) var(--ease-apple);
+  animation: staggerChild 0.3s var(--ease-apple) backwards;
+}
+.search-result-item {
+  transition: background var(--duration-short) var(--ease-apple), transform var(--duration-short) var(--ease-apple);
 }
 .search-result-item:hover, .search-result-item:focus-visible {
   background: rgba(37, 93, 110, 0.12);
   transform: translateX(3px);
   outline: 2px solid var(--deep-blue);
   outline-offset: -2px;
+}
+.search-result-item:active {
+  transform: scale(0.98) translateX(2px);
+  transition: transform var(--duration-micro) var(--ease-apple);
 }
 .search-result-icon {
   display: grid;
@@ -438,16 +497,51 @@ body { overflow: hidden; }
   box-shadow: 0 16px 40px rgba(34, 67, 75, 0.22);
   backdrop-filter: blur(24px) saturate(140%);
   -webkit-backdrop-filter: blur(24px) saturate(140%);
-  animation: placeCardSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: placeCardSlideUp 0.35s var(--ease-apple) forwards;
+  will-change: transform, opacity;
 }
 @keyframes placeCardSlideUp {
   from {
     opacity: 0;
-    transform: translate(-50%, 20px) scale(0.97);
+    transform: translate(-50%, 20px) scale(0.96);
   }
   to {
     opacity: 1;
     transform: translate(-50%, 0) scale(1);
+  }
+}
+
+/* Exit animations - reverse of entrance */
+@keyframes placeCardSlideDown {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, 10px) scale(0.98);
+  }
+}
+
+@keyframes dropdownFadeOut {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -8px) scale(0.98);
+  }
+}
+
+@keyframes toastFadeOut {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -6px);
   }
 }
 .place-preview-header {
@@ -519,14 +613,16 @@ body { overflow: hidden; }
   font-size: 13px;
   font-weight: 700;
   box-shadow: 0 4px 14px rgba(196, 80, 48, 0.3);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform var(--duration-short) var(--ease-apple), box-shadow var(--duration-short) var(--ease-apple);
 }
 .btn-start-route:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 18px rgba(196, 80, 48, 0.4);
 }
 .btn-start-route:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
+  transition: transform var(--duration-micro) var(--ease-apple), box-shadow var(--duration-micro) var(--ease-apple);
+  box-shadow: 0 2px 8px rgba(196, 80, 48, 0.4);
 }
 .btn-save-place {
   display: inline-flex;
@@ -541,7 +637,7 @@ body { overflow: hidden; }
   color: var(--ink);
   font-size: 12px;
   font-weight: 600;
-  transition: all 0.15s ease;
+  transition: all var(--duration-short) var(--ease-apple);
 }
 .btn-save-place:hover {
   background: rgba(37, 93, 110, 0.06);
@@ -571,7 +667,8 @@ body { overflow: hidden; }
   box-shadow: 0 12px 32px rgba(34, 67, 75, 0.18);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  animation: placeCardSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: navInfoSlideDown 0.4s var(--ease-apple) forwards;
+  will-change: transform, opacity;
 }
 .nav-arrow {
   display: grid;
@@ -583,7 +680,7 @@ body { overflow: hidden; }
   color: white;
   font-size: 18px;
   font-weight: 700;
-  transition: transform 0.2s ease;
+  transition: transform var(--duration-short) var(--ease-apple);
 }
 .nav-info-bar strong {
   display: block;
@@ -807,6 +904,41 @@ body { overflow: hidden; }
   }
 }
 
+/* Staggered list reveal for search results, transport options, category places */
+@keyframes staggerContainer {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes staggerChild {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Shimmer skeleton for loading states */
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Reduced motion accessibility guard */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Transport Mode Picker Modal */
 .transport-modal-card {
   position: absolute;
@@ -822,7 +954,11 @@ body { overflow: hidden; }
   box-shadow: 0 18px 45px rgba(34, 67, 75, 0.26);
   backdrop-filter: blur(24px) saturate(140%);
   -webkit-backdrop-filter: blur(24px) saturate(140%);
-  animation: placeCardSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: placeCardSlideUp 0.35s var(--ease-apple) forwards;
+  will-change: transform, opacity;
+}
+.transport-modal-card.exiting {
+  animation: placeCardSlideDown 0.2s var(--ease-apple) forwards;
 }
 
 .transport-modal-header {
@@ -839,6 +975,12 @@ body { overflow: hidden; }
   gap: 8px;
 }
 
+/* Stagger delays for transport option buttons */
+.transport-option-btn:nth-child(1) { animation: staggerChild 0.3s var(--ease-apple) backwards; animation-delay: 0ms; }
+.transport-option-btn:nth-child(2) { animation: staggerChild 0.3s var(--ease-apple) backwards; animation-delay: 60ms; }
+.transport-option-btn:nth-child(3) { animation: staggerChild 0.3s var(--ease-apple) backwards; animation-delay: 120ms; }
+.transport-option-btn:nth-child(4) { animation: staggerChild 0.3s var(--ease-apple) backwards; animation-delay: 180ms; }
+
 .transport-option-btn {
   display: flex;
   align-items: center;
@@ -854,12 +996,19 @@ body { overflow: hidden; }
   transition: all 0.15s ease;
 }
 
+.transport-option-btn {
+  transition: all var(--duration-short) var(--ease-apple);
+}
 .transport-option-btn:hover,
 .transport-option-btn:focus-visible {
   border-color: var(--deep-blue);
   background: rgba(37, 93, 110, 0.08);
   transform: translateY(-1px);
   outline: none;
+}
+.transport-option-btn:active {
+  transform: scale(0.97);
+  transition: transform var(--duration-micro) var(--ease-apple);
 }
 
 .transport-icon {
@@ -977,9 +1126,16 @@ body { overflow: hidden; }
   transition: background 0.2s ease, transform 0.15s ease;
 }
 
+.saved-explore-button {
+  transition: background var(--duration-short) var(--ease-apple), transform var(--duration-short) var(--ease-apple);
+}
 .saved-explore-button:hover {
   background: var(--ink);
   transform: translateY(-1px);
+}
+.saved-explore-button:active {
+  transform: scale(0.97);
+  transition: transform var(--duration-micro) var(--ease-apple);
 }
 
 /* Profile Card Popover */
@@ -997,7 +1153,11 @@ body { overflow: hidden; }
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   padding: 18px;
-  animation: dropdownPopUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: dropdownPopUp 0.25s var(--ease-apple) forwards;
+  will-change: transform, opacity;
+}
+.profile-card-popover.exiting {
+  animation: dropdownFadeOut 0.2s var(--ease-apple) forwards;
 }
 
 .profile-card-header {

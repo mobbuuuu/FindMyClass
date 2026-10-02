@@ -598,6 +598,18 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
           // Destination marker with animated glow
           destMarker.current = createDestinationMarker(L, to, navigateTo.name, "Tujuanmu").addTo(map.current);
 
+          // Bounce animation on destination marker after route renders
+          setTimeout(() => {
+            if (destMarker.current && destMarker.current._icon) {
+              const iconEl = destMarker.current._icon;
+              iconEl.style.transition = 'transform 400ms cubic-bezier(0.23, 1, 0.32, 1)';
+              iconEl.style.transform = 'scale(1.2)';
+              setTimeout(() => {
+                if (iconEl && iconEl.style) iconEl.style.transform = 'scale(1)';
+              }, 400);
+            }
+          }, 600);
+
           // Fit view to entire route with comfortable padding
           const bounds = L.latLngBounds(routeCoords);
           map.current.fitBounds(bounds, { padding: [60, 60], maxZoom: 18 });

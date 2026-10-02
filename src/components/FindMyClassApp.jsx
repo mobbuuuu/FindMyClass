@@ -26,8 +26,11 @@ export default function FindMyClassApp() {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [navigateTo, setNavigateTo] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
+  const [showProfileExiting, setShowProfileExiting] = useState(false);
   const [showTransportModal, setShowTransportModal] = useState(false);
+  const [showTransportExiting, setShowTransportExiting] = useState(false);
   const [showGatePicker, setShowGatePicker] = useState(false);
+  const [showGateExiting, setShowGateExiting] = useState(false);
   const [selectedTransportMode, setSelectedTransportMode] = useState(null);
   const [savedPlaces, setSavedPlaces] = useState([
     CAMPUS_PLACES.find((p) => p.name.includes("Landmark Tower")) || CAMPUS_PLACES[0],
@@ -119,6 +122,32 @@ export default function FindMyClassApp() {
     mapRef.current?.clearRoute();
   }
 
+  // Animated close handlers with exit transitions
+  function closeProfile() {
+    setShowProfileExiting(true);
+    setTimeout(() => {
+      setShowProfile(false);
+      setShowProfileExiting(false);
+    }, 200);
+  }
+
+  function closeTransport() {
+    setShowTransportExiting(true);
+    setTimeout(() => {
+      setShowTransportModal(false);
+      setShowTransportExiting(false);
+    }, 200);
+  }
+
+  function closeGatePicker() {
+    setShowGateExiting(true);
+    setTimeout(() => {
+      setShowGatePicker(false);
+      setShowGateExiting(false);
+      setSelectedTransportMode(null);
+    }, 200);
+  }
+
   function toggleSavePlace(place) {
     setSavedPlaces((prev) => {
       const exists = prev.some((p) => p.name === place.name);
@@ -193,8 +222,12 @@ export default function FindMyClassApp() {
             aria-label="Buka profil pengguna"
             aria-expanded={showProfile}
             onClick={() => {
-              setShowProfile((prev) => !prev);
-              if (activeTab === "Saved") setActiveTab("Explore");
+              if (showProfile) {
+                closeProfile();
+              } else {
+                setShowProfile(true);
+                if (activeTab === "Saved") setActiveTab("Explore");
+              }
             }}
           >
             AS
@@ -241,12 +274,13 @@ export default function FindMyClassApp() {
           {searchResults.length === 0 ? (
             <div className="search-no-result">Tidak ditemukan "{query}"</div>
           ) : (
-            searchResults.map((place) => (
+            searchResults.map((place, index) => (
               <button
                 key={place.name}
                 className="search-result-item"
                 type="button"
                 role="option"
+                style={{ '--index': index }}
                 onClick={() => {
                   handleSelectPlace(place);
                   setQuery("");
@@ -308,8 +342,8 @@ export default function FindMyClassApp() {
       )}
 
       {/* Modal / Dialog Pemilihan Moda Transportasi Kampus */}
-      {selectedPlace && showTransportModal && !navigateTo && (
-        <section className="transport-modal-card" role="dialog" aria-label="Pilih Moda Transportasi">
+      {selectedPlace && (showTransportModal || showTransportExiting) && !navigateTo && (
+        <section className={`transport-modal-card ${showTransportExiting ? 'exiting' : ''}`} role="dialog" aria-label="Pilih Moda Transportasi">
           <div className="transport-modal-header">
             <div>
               <span className="place-kind-badge">Opsi Perjalanan</span>
@@ -319,7 +353,7 @@ export default function FindMyClassApp() {
             <button
               type="button"
               className="place-close-btn"
-              onClick={() => setShowTransportModal(false)}
+              onClick={closeTransport}
               aria-label="Tutup pemilihan kendaraan"
             >
               ×
@@ -378,8 +412,8 @@ export default function FindMyClassApp() {
       )}
 
       {/* Gate Picker Modal (for Motor/Mobil Pribadi) */}
-      {selectedPlace && showGatePicker && !navigateTo && (
-        <section className="transport-modal-card" role="dialog" aria-label="Pilih Gerbang Masuk">
+      {selectedPlace && (showGatePicker || showGateExiting) && !navigateTo && (
+        <section className={`transport-modal-card ${showGateExiting ? 'exiting' : ''}`} role="dialog" aria-label="Pilih Gerbang Masuk">
           <div className="transport-modal-header">
             <div>
               <span className="place-kind-badge">Gerbang Masuk</span>
@@ -389,7 +423,7 @@ export default function FindMyClassApp() {
             <button
               type="button"
               className="place-close-btn"
-              onClick={() => setShowGatePicker(false)}
+              onClick={closeGatePicker}
               aria-label="Tutup pemilihan gerbang"
             >
               ×
@@ -485,8 +519,8 @@ export default function FindMyClassApp() {
       )}
 
       {/* Profile Card Popover */}
-      {showProfile && (
-        <section className="profile-card-popover" aria-label="Informasi profil">
+      {(showProfile || showProfileExiting) && (
+        <section className={`profile-card-popover ${showProfileExiting ? 'exiting' : ''}`} aria-label="Informasi profil">
           <div className="profile-card-header">
             <div className="profile-identity">
               <div className="profile-avatar-large" aria-hidden="true">AS</div>
@@ -499,7 +533,7 @@ export default function FindMyClassApp() {
               type="button"
               className="profile-close-btn"
               aria-label="Tutup profil"
-              onClick={() => setShowProfile(false)}
+              onClick={closeProfile}
             >
               ×
             </button>
