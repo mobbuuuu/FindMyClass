@@ -202,28 +202,77 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.2; /* very light overlay */
+  opacity: 0.2;
+  transition: opacity 0.4s ease, filter 0.4s ease;
+}
+
+.welcome-panel.scrolled .welcome-video-bg video {
+  opacity: 0.55;
+  filter: blur(0);
+}
+
+.welcome-panel:not(.scrolled) .welcome-video-bg video {
+  opacity: 0.2;
+  filter: blur(30px);
 }
 
 .video-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(90deg, rgba(10,22,40,0.92) 0%, rgba(10,22,40,0.5) 70%);
+  transition: background 0.4s ease;
 }
 
-/* Content aligned middle‑left with scroll support */
-.welcome-content {
-  position: relative;
-  z-index: 10;
+.welcome-panel.scrolled .video-overlay {
+  background: linear-gradient(180deg, rgba(10,22,40,0.96) 0%, rgba(10,22,40,0.75) 100%);
+}
+
+/* Layer 1: Hero — fixed center-left, fades out on scroll */
+.welcome-hero-layer {
+  position: fixed;
+  top: 46%;
+  left: max(24px, 8vw);
   max-width: 560px;
-  margin-left: max(24px, 8vw);
-  padding-top: max(60px, 12vh);
-  padding-bottom: 80px;
   color: #fff;
-  animation: welcomeContentIn 0.6s var(--ease-out-expo) 0.1s both;
+  transform: translateY(0);
+  opacity: 1;
+  transition: opacity 0.45s var(--ease-apple), transform 0.45s var(--ease-apple);
+  pointer-events: auto;
+  animation: none;
 }
 
-@keyframes welcomeContentIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.welcome-hero-layer.scrolled-out {
+  opacity: 0;
+  transform: translateY(-32px);
+  pointer-events: none;
+}
+
+/* Spacer — one full viewport before Layer 2 appears */
+.welcome-scroll-spacer {
+  height: 100vh;
+  height: 100dvh;
+  pointer-events: none;
+}
+
+/* Layer 2: Committers — in scroll flow, fades in */
+.committers-layer {
+  position: relative;
+  z-index: 30;
+  width: min(880px, calc(100vw - 48px));
+  margin: 0 auto;
+  padding: 80px 0 120px;
+  color: #fff;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.5s var(--ease-apple), transform 0.5s var(--ease-apple);
+  pointer-events: none;
+}
+
+.committers-layer.scrolled-in {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
 
 .welcome-eyebrow {
   margin: 0 0 12px;
@@ -281,91 +330,88 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   transition: transform var(--duration-micro) var(--ease-apple);
 }
 
-/* Committers Section */
-.committers-section {
-  margin-top: 60px;
-  padding-top: 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-}
-
 .committers-title {
-  margin: 0 0 20px;
-  font-size: 20px;
+  margin: 0 0 24px;
+  font-size: 22px;
   font-weight: 700;
   letter-spacing: 0.5px;
   color: var(--yellow);
 }
 
-.committers-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.committers-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.committer-card {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-}
-
-.committer-item {
-  display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 12px 16px;
-  border-radius: 14px;
+  text-align: center;
+  gap: 16px;
+  padding: 24px 20px;
+  border-radius: 20px;
   background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: transform var(--duration-short) var(--ease-apple), background var(--duration-short) var(--ease-apple);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: transform var(--duration-short) var(--ease-apple), background var(--duration-short) var(--ease-apple), border-color var(--duration-short) var(--ease-apple);
 }
 
-.committer-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateX(4px);
+.committer-card:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-4px);
 }
 
 .committer-avatar {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
+  width: 88px;
+  height: 88px;
+  min-width: 88px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.12);
-  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
 .committer-avatar svg {
-  width: 22px;
-  height: 22px;
+  width: 44px;
+  height: 44px;
 }
 
 .committer-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
 }
 
 .committer-name {
-  font-size: 14.5px;
+  font-size: 16px;
   font-weight: 700;
   color: #fff;
 }
 
 .committer-role {
-  font-size: 12.5px;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.35;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.4;
 }
 
 @media (max-width:480px) {
-  .welcome-content { left:auto; width:auto; max-width:none; margin-left:20px; margin-right:20px; padding-top:max(48px,10vh); box-sizing:border-box; }
+  .welcome-hero-layer { top: 46%; left: 20px; right: 20px; max-width: none; }
   .welcome-title { font-size:29px; overflow-wrap:break-word; }
   .welcome-desc { font-size:13.5px; max-width:100%; }
   .welcome-btn { width:100%; min-height:48px; box-sizing:border-box; }
   .video-overlay { background:linear-gradient(180deg, rgba(10,22,40,0.94) 0%, rgba(10,22,40,0.82) 100%); }
-  .committer-item { padding:12px; }
-  .committer-role { overflow-wrap:anywhere; }
+  .committers-layer { width: calc(100vw - 40px); padding-top: 16px; }
+  .committers-grid { grid-template-columns:1fr; gap:16px; }
+  .committer-avatar { width:72px; height:72px; min-width:72px; }
+  .committer-avatar svg { width:36px; height:36px; }
+  .committer-card { padding:20px 16px; }
 }
 
 /* Full-screen map workspace with a liquid‑glass command capsule. */
