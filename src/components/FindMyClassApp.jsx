@@ -12,9 +12,9 @@ const CATEGORIES = [
 
 function Brand() {
   return (
-    <a className="brand map-brand" href="#map" aria-label="FindMyClass home">
+    <a className="brand map-brand" href="#map" aria-label="TelyuFinder home">
       <span className="brand-mark" aria-hidden="true">+</span>
-      <span>Find<span>MyClass</span></span>
+      <span>Telyu<span>Finder</span></span>
     </a>
   );
 }
