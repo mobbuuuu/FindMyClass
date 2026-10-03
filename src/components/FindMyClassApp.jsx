@@ -19,7 +19,11 @@ function Brand() {
   );
 }
 
+import WelcomePanel from "./WelcomePanel.jsx";
+
 export default function FindMyClassApp() {
+  const [showWelcome, setShowWelcome] = useState(true);
+
   const [query, setQuery] = useState("");
   const [activeTab, setActiveTab] = useState("Explore");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -156,6 +160,10 @@ export default function FindMyClassApp() {
       }
       return [...prev, place];
     });
+  }
+
+  if (showWelcome) {
+    return <WelcomePanel onComplete={() => setShowWelcome(false)} />;
   }
 
   return (

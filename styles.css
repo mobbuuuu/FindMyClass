@@ -131,6 +131,308 @@ h1 em { color: var(--deep-blue); font-style: normal; }
 }
 .map-status { position: absolute; z-index: 500; right: 18px; bottom: 18px; max-width: 240px; margin: 0; padding: 8px 12px; border-radius: 8px; color: var(--ink); background: rgba(255, 254, 250, .95); font-size: 11px; box-shadow: 0 4px 12px rgba(43, 65, 73, .12); }
 
+/* ============================================
+   WELCOME PANEL — Onboarding slideshow overlay
+   ============================================ */
+
+.welcome-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  overflow: hidden;
+  animation: welcomeFadeIn 0.5s var(--ease-out-expo) forwards;
+}
+
+.welcome-panel.exiting {
+  animation: welcomeFadeOut 0.3s var(--ease-apple) forwards;
+}
+
+@keyframes welcomeFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes welcomeFadeOut {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(1.03); }
+}
+
+/* Video background layer */
+.welcome-video-bg {
+  position: absolute;
+  inset: 0;
+  background: #0a1628;
+}
+
+.welcome-video-bg video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.7;
+}
+
+.video-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 22, 40, 0.2) 0%,
+    rgba(10, 22, 40, 0.5) 50%,
+    rgba(10, 22, 40, 0.92) 100%
+  );
+}
+
+/* Slides carousel */
+.welcome-slides-container {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  width: 100%;
+  flex: 1;
+  transition: transform 0.45s var(--ease-out-expo);
+  will-change: transform;
+}
+
+.welcome-slide {
+  min-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 0 12px;
+}
+
+.slide-content {
+  width: min(560px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+/* Reference image card */
+.slide-image-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  aspect-ratio: 16 / 9;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  animation: slideImagePop 0.5s var(--ease-out-expo) both;
+}
+
+@keyframes slideImagePop {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.slide-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.image-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px 14px;
+  background: rgba(10, 22, 40, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-align: center;
+}
+
+/* Text below image */
+.slide-text {
+  animation: slideTextIn 0.5s var(--ease-out-expo) 0.1s both;
+}
+
+@keyframes slideTextIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.slide-text h2 {
+  margin: 0 0 6px;
+  font-size: clamp(20px, 4vw, 26px);
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.slide-text p {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.55;
+  max-width: 440px;
+}
+
+/* Dot indicators */
+.welcome-dots {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+  padding: 16px 0 12px;
+}
+
+.welcome-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(255, 255, 255, 0.35);
+  padding: 0;
+  cursor: pointer;
+  transition: all var(--duration-short) var(--ease-apple);
+}
+
+.welcome-dot.active {
+  width: 24px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* Bottom nav buttons */
+.welcome-nav {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(560px, calc(100vw - 32px));
+  padding-bottom: max(28px, env(safe-area-inset-bottom, 28px));
+}
+
+.welcome-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 50px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--duration-short) var(--ease-apple);
+}
+
+.welcome-btn:active {
+  transform: scale(0.96);
+  transition: transform var(--duration-micro) var(--ease-apple);
+}
+
+.welcome-btn-prev {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  min-width: 44px;
+}
+
+.welcome-btn-prev:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.welcome-btn-prev:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.welcome-btn-next {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.welcome-btn-next:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.welcome-btn-next.primary {
+  background: var(--coral);
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 6px 24px rgba(196, 80, 48, 0.45);
+}
+
+.welcome-btn-next.primary:hover {
+  background: #d05535;
+  box-shadow: 0 8px 28px rgba(196, 80, 48, 0.55);
+  transform: translateY(-1px);
+}
+
+/* Skip button */
+.welcome-skip {
+  position: absolute;
+  top: max(20px, env(safe-area-inset-top, 20px));
+  right: 20px;
+  z-index: 10;
+  padding: 8px 16px;
+  min-height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all var(--duration-short) var(--ease-apple);
+  animation: welcomeFadeIn 0.6s var(--ease-out-expo) 0.4s both;
+}
+
+.welcome-skip:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+.welcome-skip:active {
+  transform: scale(0.95);
+}
+
+@media (max-width: 480px) {
+  .slide-text h2 {
+    font-size: 19px;
+  }
+  .slide-text p {
+    font-size: 13px;
+  }
+  .welcome-btn {
+    min-height: 46px;
+    font-size: 13px;
+    padding: 0 16px;
+  }
+  .welcome-nav {
+    gap: 8px;
+  }
+}
+
 /* Full-screen map workspace with a liquid-glass command capsule. */
 html, body, #root { min-height: 100%; }
 body { overflow: hidden; }
