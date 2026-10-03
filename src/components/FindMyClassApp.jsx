@@ -162,11 +162,11 @@ export default function FindMyClassApp() {
     });
   }
 
-  if (showWelcome) {
-    return <WelcomePanel onComplete={() => setShowWelcome(false)} />;
-  }
-
   return (
+    <>
+      {showWelcome && (
+        <WelcomePanel onComplete={() => setShowWelcome(false)} />
+      )}
     <main className="map-app" id="map">
       <CampusMap
         ref={mapRef}
@@ -576,5 +576,6 @@ export default function FindMyClassApp() {
         </div>
       )}
     </main>
+    </>
   );
 }
