@@ -1,16 +1,71 @@
 import { useState, useEffect } from "react";
 
+const PHRASES = [
+  "Bingung dimana kelas kamu?",
+  "Bingung mau makan minum dimana?",
+  "Nyari toilet terdekat?",
+  "Mau ke masjid kampus?",
+  "Bingung parkir dimana?",
+];
+
+const TYPE_SPEED = 60;
+const DELETE_SPEED = 30;
+const PAUSE_AFTER_TYPE = 1800;
+const PAUSE_AFTER_DELETE = 400;
+
 export default function WelcomePanel({ onComplete }) {
   const [isExiting, setIsExiting] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [typedText, setTypedText] = useState("");
+  const [cursorVisible, setCursorVisible] = useState(true);
+  const [phraseIdx, setPhraseIdx] = useState(0);
+  const [charIdx, setCharIdx] = useState(0);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!isExiting) return undefined;
-    const timer = setTimeout(() => {
-      onComplete();
-    }, 500);
+    const timer = setTimeout(() => { onComplete(); }, 500);
     return () => clearTimeout(timer);
   }, [isExiting, onComplete]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCursorVisible(v => !v);
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    let timeout;
+    const phrase = PHRASES[phraseIdx];
+
+    if (!deleting) {
+      if (charIdx < phrase.length) {
+        timeout = setTimeout(() => {
+          setTypedText(phrase.slice(0, charIdx + 1));
+          setCharIdx(c => c + 1);
+        }, TYPE_SPEED);
+      } else {
+        timeout = setTimeout(() => {
+          setDeleting(true);
+        }, PAUSE_AFTER_TYPE);
+      }
+    } else {
+      if (charIdx > 0) {
+        timeout = setTimeout(() => {
+          setTypedText(phrase.slice(0, charIdx - 1));
+          setCharIdx(c => c - 1);
+        }, DELETE_SPEED);
+      } else {
+        timeout = setTimeout(() => {
+          setDeleting(false);
+          setPhraseIdx(i => (i + 1) % PHRASES.length);
+        }, PAUSE_AFTER_DELETE);
+      }
+    }
+
+    return () => clearTimeout(timeout);
+  }, [phraseIdx, charIdx, deleting]);
 
   const handleStart = () => {
     setIsExiting(true);
@@ -39,7 +94,8 @@ export default function WelcomePanel({ onComplete }) {
       <div className={`welcome-hero-layer ${isScrolled ? "scrolled-out" : ""}`}>
         <p className="welcome-eyebrow">TelyuFinder</p>
         <h1 className="welcome-title">
-          Telusuri setiap sudut kampus <span>lebih mudah</span>
+          {typedText}
+          <span className={`cursor ${cursorVisible ? "on" : ""}`}>|</span>
         </h1>
         <p className="welcome-desc">
           Panduan interaktif Telkom University Bandung — cari ruang kelas, asrama,

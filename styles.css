@@ -289,9 +289,17 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   font-weight: 700;
   line-height: 1.08;
   letter-spacing: -1px;
+  min-height: 2.2em; /* prevent layout shift while typing */
 }
 
-.welcome-title span { color: var(--yellow); }
+.welcome-title .cursor {
+  display: inline-block;
+  color: var(--yellow);
+  opacity: 0;
+  margin-left: 2px;
+  font-weight: 300;
+}
+.welcome-title .cursor.on { opacity: 1; }
 
 .welcome-desc {
   margin: 0 0 28px;
