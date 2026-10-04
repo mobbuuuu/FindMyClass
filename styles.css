@@ -188,11 +188,11 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   }
 }
 
-/* Transparent video background fixed */
+/* Video background container with solid base to hide map behind welcome panel */
 .welcome-video-bg {
   position: fixed;
   inset: 0;
-  background: transparent;
+  background: #0a1628;
   pointer-events: none;
 }
 
@@ -202,18 +202,19 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.2;
+  opacity: 0.55;
+  filter: blur(0);
   transition: opacity 0.4s ease, filter 0.4s ease;
 }
 
 .welcome-panel.scrolled .welcome-video-bg video {
-  opacity: 0.55;
-  filter: blur(0);
+  opacity: 0.2;
+  filter: blur(30px);
 }
 
 .welcome-panel:not(.scrolled) .welcome-video-bg video {
-  opacity: 0.2;
-  filter: blur(30px);
+  opacity: 0.55;
+  filter: blur(0);
 }
 
 .video-overlay {
