@@ -432,6 +432,14 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   .committer-card { padding:20px 16px; }
 }
 
+/* Keep browser zoom at 100% while giving the desktop composition more room. */
+@media (min-width: 769px) {
+  .welcome-panel,
+  .map-app {
+    zoom: 0.8;
+  }
+}
+
 /* Full-screen map workspace with a liquid‑glass command capsule. */
 html, body, #root { min-height: 100%; }
 body { overflow: hidden; }

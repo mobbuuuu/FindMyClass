@@ -13,9 +13,16 @@ const DELETE_SPEED = 30;
 const PAUSE_AFTER_TYPE = 1800;
 const PAUSE_AFTER_DELETE = 400;
 
+const VIDEO_SLOTS = [
+  "/welcome/campus-profile.mp4",
+  "/welcome/campus-background-2.mp4",
+  "/welcome/campus-background-3.mp4",
+];
+
 export default function WelcomePanel({ onComplete }) {
   const [isExiting, setIsExiting] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [videoSlot, setVideoSlot] = useState(0);
   const [typedText, setTypedText] = useState("");
   const [cursorVisible, setCursorVisible] = useState(true);
   const [phraseIdx, setPhraseIdx] = useState(0);
@@ -75,6 +82,10 @@ export default function WelcomePanel({ onComplete }) {
     setIsScrolled(e.currentTarget.scrollTop > 50);
   };
 
+  const selectNextVideo = () => {
+    setVideoSlot((currentSlot) => (currentSlot + 1) % VIDEO_SLOTS.length);
+  };
+
   return (
     <section
       className={`welcome-panel ${isExiting ? "exiting" : ""} ${isScrolled ? "scrolled" : ""}`}
@@ -84,8 +95,16 @@ export default function WelcomePanel({ onComplete }) {
       aria-modal="true"
     >
       <div className="welcome-video-bg" aria-hidden="true">
-        <video autoPlay muted loop playsInline poster="/welcome/campus-poster.jpg">
-          <source src="/welcome/campus-profile.mp4" type="video/mp4" />
+        <video
+          key={VIDEO_SLOTS[videoSlot]}
+          autoPlay
+          muted
+          playsInline
+          poster="/welcome/campus-poster.jpg"
+          onEnded={selectNextVideo}
+          onError={selectNextVideo}
+        >
+          <source src={VIDEO_SLOTS[videoSlot]} type="video/mp4" />
         </video>
         <div className="video-overlay" aria-hidden="true" />
       </div>
