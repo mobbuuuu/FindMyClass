@@ -438,6 +438,12 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   .map-app {
     zoom: 0.8;
   }
+
+  .map-app {
+    height: 125vh;
+    height: 125dvh;
+    min-height: 125%;
+  }
 }
 
 /* Full-screen map workspace with a liquid‑glass command capsule. */
