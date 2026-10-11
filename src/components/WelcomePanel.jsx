@@ -13,7 +13,7 @@ const DELETE_SPEED = 30;
 const PAUSE_AFTER_TYPE = 1800;
 const PAUSE_AFTER_DELETE = 400;
 
-export default function WelcomePanel({ onComplete }) {
+export default function WelcomePanel({ onComplete, onStartExplore }) {
   const [isExiting, setIsExiting] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [typedText, setTypedText] = useState("");
@@ -69,6 +69,7 @@ export default function WelcomePanel({ onComplete }) {
 
   const handleStart = () => {
     setIsExiting(true);
+    if (onStartExplore) onStartExplore();
   };
 
   const handleScroll = (e) => {

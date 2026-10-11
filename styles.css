@@ -440,6 +440,24 @@ body { overflow: hidden; }
 .map-app > .campus-map-shell .campus-map { min-height: 0; }
 .map-app .leaflet-control-zoom { display: none; }
 
+/* Map blur-out / zoom-in transition when entering from welcome */
+.map-app.map-entering {
+  filter: blur(12px);
+  transform: scale(1.08);
+  animation: mapBlurOut 1s ease-out forwards;
+}
+
+@keyframes mapBlurOut {
+  0% {
+    filter: blur(12px);
+    transform: scale(1.08);
+  }
+  100% {
+    filter: blur(0px);
+    transform: scale(1);
+  }
+}
+
 /* Floating Top Navigation Stack */
 .top-nav-stack {
   position: absolute;

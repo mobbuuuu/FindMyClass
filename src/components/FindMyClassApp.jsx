@@ -23,6 +23,8 @@ import WelcomePanel from "./WelcomePanel.jsx";
 
 export default function FindMyClassApp() {
   const [showWelcome, setShowWelcome] = useState(true);
+  const [mapTransitioning, setMapTransitioning] = useState(false);
+
 
   const [query, setQuery] = useState("");
   const [activeTab, setActiveTab] = useState("Explore");
@@ -165,9 +167,15 @@ export default function FindMyClassApp() {
   return (
     <>
       {showWelcome && (
-        <WelcomePanel onComplete={() => setShowWelcome(false)} />
+        <WelcomePanel
+          onStartExplore={() => setMapTransitioning(true)}
+          onComplete={() => {
+            setShowWelcome(false);
+            setTimeout(() => setMapTransitioning(false), 1000);
+          }}
+        />
       )}
-    <main className="map-app" id="map">
+    <main className={`map-app${mapTransitioning ? " map-entering" : ""}`} id="map">
       <CampusMap
         ref={mapRef}
         navigateTo={navigateTo}
