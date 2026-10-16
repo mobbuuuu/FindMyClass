@@ -20,8 +20,9 @@
 }
 
 * { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; overflow: hidden; }
 html { scroll-behavior: smooth; }
-body { margin: 0; color: var(--ink); background: var(--cream); font-family: "DM Sans", sans-serif; -webkit-tap-highlight-color: transparent; }
+body { color: var(--ink); background: var(--cream); font-family: "DM Sans", sans-serif; -webkit-tap-highlight-color: transparent; }
 a { color: inherit; text-decoration: none; }
 button, input { font: inherit; }
 button { cursor: pointer; touch-action: manipulation; }
@@ -432,12 +433,25 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   .committer-card { padding:20px 16px; }
 }
 
+/* Keep browser zoom at 100% while giving the desktop composition more room. */
+@media (min-width: 769px) {
+  .welcome-panel,
+  .map-app {
+    zoom: 0.8;
+  }
+
+  .map-app {
+    height: 125vh;
+    height: 125dvh;
+    min-height: 125%;
+  }
+}
+
 /* Full-screen map workspace with a liquid‑glass command capsule. */
-html, body, #root { min-height: 100%; }
-body { overflow: hidden; }
-.map-app { position: relative; width: 100%; height: 100vh; height: 100dvh; min-height: 100%; overflow: hidden; background: #d8edea; overscroll-behavior: contain; }
-.map-app > .campus-map-shell { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; min-height: 0; border-radius: 0; box-shadow: none; }
-.map-app > .campus-map-shell .campus-map { min-height: 0; }
+.map-app { position: fixed; inset: 0; width: 100%; height: 100vh; height: 100dvh; overflow: hidden; background: #d8edea; overscroll-behavior: contain; }
+.map-app > .campus-map-shell { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; height: 100dvh; min-height: 0; border-radius: 0; box-shadow: none; }
+.map-app > .campus-map-shell .campus-map,
+.map-app > .campus-map-shell .leaflet-container { width: 100%; height: 100%; height: 100dvh; min-height: 0; }
 .map-app .leaflet-control-zoom { display: none; }
 
 /* Map blur-out / zoom-in transition when entering from welcome */

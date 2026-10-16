@@ -308,6 +308,7 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
   const onSelectPlaceRef = useRef(onSelectPlace);
   const placeMarkersRef = useRef({});
   const activeMarkerRef = useRef(null);
+  const resizeCleanupRef = useRef(null);
   const [locationMessage, setLocationMessage] = useState("");
   const [isLocating, setIsLocating] = useState(false);
   const [navInfo, setNavInfo] = useState(null); // { distance, bearing, destName }
@@ -418,11 +419,21 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
       });
 
       map.current = campusMap;
+
+      // Re-measure Leaflet once the shell settles so tiles fill the viewport
+      const onResize = () => campusMap.invalidateSize();
+      window.addEventListener("resize", onResize);
+      setTimeout(onResize, 120);
+      resizeCleanupRef.current = onResize;
     });
 
     return () => {
       disposed = true;
       campusMap?.remove();
+      if (resizeCleanupRef.current) {
+        window.removeEventListener("resize", resizeCleanupRef.current);
+        resizeCleanupRef.current = null;
+      }
       map.current = null;
       locationMarker.current = null;
       placeMarkersRef.current = {};
