@@ -440,19 +440,22 @@ h1 em { color: var(--deep-blue); font-style: normal; }
     zoom: 0.8;
   }
 
-  .map-app {
-    height: 125vh;
-    height: 125dvh;
-    min-height: 125%;
-  }
 }
 
 /* Full-screen map workspace with a liquid‑glass command capsule. */
 .map-app { position: fixed; inset: 0; width: 100%; height: 100vh; height: 100dvh; overflow: hidden; background: #d8edea; overscroll-behavior: contain; }
-.map-app > .campus-map-shell { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; height: 100dvh; min-height: 0; border-radius: 0; box-shadow: none; }
+.map-app > .campus-map-shell { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; min-height: 0; border-radius: 0; box-shadow: none; }
 .map-app > .campus-map-shell .campus-map,
-.map-app > .campus-map-shell .leaflet-container { width: 100%; height: 100%; height: 100dvh; min-height: 0; }
+.map-app > .campus-map-shell .leaflet-container { width: 100%; height: 100%; min-height: 0; }
 .map-app .leaflet-control-zoom { display: none; }
+
+@media (min-width: 769px) {
+  .map-app {
+    height: 125vh;
+    height: 125dvh;
+    min-height: 0;
+  }
+}
 
 /* Map blur-out / zoom-in transition when entering from welcome */
 .map-app.map-entering {
