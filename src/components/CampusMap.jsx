@@ -30,55 +30,48 @@ const TELKOM_BOUNDARY = [
   [-6.9707124, 107.6267702],
 ];
 export const CAMPUS_PLACES = [
-  // 1-6: Utama
-  { name: "Asrama Putra", position: [-6.9711944444, 107.6287777778], kind: "Dormitory" }, // 6°58'16.3"S 107°37'43.6"E
+  { name: "Asrama Putra", position: [-6.9711944444, 107.6287777778], kind: "Dormitory" },
   { name: "Sport Center", position: [-6.971617, 107.628700], kind: "Sports" },
-  { name: "Asrama Putri", position: [-6.9743055556, 107.6290555556], kind: "Dormitory" }, // 6°58'27.5"S 107°37'44.6"E
-  { name: "Tel-U Coffee", position: [-6.9731388889, 107.6293055556], kind: "Cafe" }, // 6°58'23.3"S 107°37'45.5"E
-  { name: "Telkom University Library, Study Space", position: [-6.971760334262225, 107.6324196103809], kind: "Study space" }, // 6°58'19.3"S 107°37'55.9"E
-  { name: "Telkom University Campus", position: [-6.9729166667, 107.6300000000], kind: "Campus" }, // 6°58'22.5"S 107°37'48.0"E
+  { name: "Asrama Putri", position: [-6.9743055556, 107.6290555556], kind: "Dormitory" },
+  { name: "Tel-U Coffee", position: [-6.9731388889, 107.6293055556], kind: "Cafe" },
+  { name: "Telkom University Library, Study Space", position: [-6.971760334262225, 107.6324196103809], kind: "Study space" },
+  { name: "Telkom University Campus", position: [-6.9729166667, 107.6300000000], kind: "Campus" },
   { name: "Telkom University Landmark Tower (TULT)", position: [-6.968949, 107.628111], kind: "Building" },
   { name: "Bandung Techno Park", position: [-6.970428, 107.630277], kind: "Landmark" },
   { name: "Lesehan Hijau", position: [-6.974359, 107.629813], kind: "Landmark" },
   { name: "PAUD Telkom", position: [-6.975123, 107.632391], kind: "Building" },
   { name: "Taman Telkom", position: [-6.974424, 107.632134], kind: "Landmark" },
 
-  // Tambahan 1-6
-  { name: "Fakultas Komunikasi dan Ilmu Sosial", position: [-6.972002173916829, 107.63281880706629], kind: "Faculty" }, // 6°58'19.8"S 107°37'57.7"E
-  { name: "Fakultas Ilmu Terapan", position: [-6.9731944444, 107.6326666667], kind: "Faculty" }, // 6°58'23.5"S 107°37'57.6"E
-  { name: "Fakultas Ekonomi dan Bisnis", position: [-6.971336184403436, 107.631943572998], kind: "Faculty" }, // 6°58'17.8"S 107°37'54.9"E
-  { name: "Fakultas Industri Kreatif", position: [-6.9717777778, 107.6315000000], kind: "Faculty" }, // 6°58'18.4"S 107°37'53.4"E
-  { name: "Telkom University Convention Hall", position: [-6.9712777778, 107.6312222222], kind: "Hall" }, // 6°58'16.6"S 107°37'52.4"E
-  { name: "Danau Galau", position: [-6.9731666667, 107.6312777778], kind: "Landmark" }, // 6°58'23.4"S 107°37'52.6"E
+  { name: "Fakultas Komunikasi dan Ilmu Sosial", position: [-6.972002173916829, 107.63281880706629], kind: "Faculty" },
+  { name: "Fakultas Ilmu Terapan", position: [-6.9731944444, 107.6326666667], kind: "Faculty" },
+  { name: "Fakultas Ekonomi dan Bisnis", position: [-6.971336184403436, 107.631943572998], kind: "Faculty" },
+  { name: "Fakultas Industri Kreatif", position: [-6.9717777778, 107.6315000000], kind: "Faculty" },
+  { name: "Telkom University Convention Hall", position: [-6.9712777778, 107.6312222222], kind: "Hall" },
+  { name: "Danau Galau", position: [-6.9731666667, 107.6312777778], kind: "Landmark" },
 
-  // Tambahan 7-9: GKU
   { name: "Gedung Kuliah Umum 1", position: [-6.974390859546471, 107.63106844734378], kind: "Lecture", address: "Jl. Telekomunikasi, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257" },
   { name: "Gedung Kuliah Umum 2", position: [-6.9748408361847485, 107.63105842897347], kind: "Lecture" },
   { name: "Gedung Kuliah Umum 3", position: [-6.972866066219806, 107.6298691237254], kind: "Lecture" },
 
-  // Tambahan 10-15
-  { name: "Food Court Asrama Putri", position: [-6.9741944444, 107.6292777778], kind: "Food Court" }, // 6°58'27.1"S 107°37'45.4"E
+  { name: "Food Court Asrama Putri", position: [-6.9741944444, 107.6292777778], kind: "Food Court" },
   { name: "Kantin Putri", position: [-6.974439793270318, 107.6287960878003], kind: "Canteen" },
   { name: "Fakultas Teknik Elektro", position: [-6.975473686188717, 107.6295071364736], kind: "Faculty" },
   { name: "Fakultas Informatika", position: [-6.9758309689279425, 107.63069039465188], kind: "Faculty" },
   { name: "Gedung Serba guna", position: [-6.9763885581062715, 107.63028949108872], kind: "Hall" },
   { name: "Masjid Syamsul Ulum", position: [-6.975699272034128, 107.6321904194122], kind: "Mosque" },
 
-  // Tambahan 16-20: Gates
   { name: "Gate 1", position: [-6.972076, 107.633449], kind: "Gate", address: "Stt Telkom, Jl. Telekomunikasi Jl. Sukapura, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40267" },
   { name: "Gate 2", position: [-6.973109, 107.633289], kind: "Gate", address: "2JGM+P8R, Jl. Telekomunikasi, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257" },
   { name: "Gate 3", position: [-6.974003, 107.632496], kind: "Gate", address: "2JGM+C26, Jl. Telekomunikasi, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257" },
   { name: "Gate 4", position: [-6.976102, 107.632827], kind: "Gate", address: "Jl. Sukabirus No.72, Sukapura, Kec. Dayeuhkolot, Kota Bandung, Jawa Barat 40257" },
   { name: "Gate 5", position: [-6.975225, 107.628982], kind: "Gate", address: "2JFH+WH5, Jl. Radio Palasari Road, Citeureup, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257" },
 
-  // Parkiran Kendaraan Kampus
   { name: "Parkiran Motor (Sport Center)", position: [-6.9716666667, 107.6295555556], kind: "Building", address: "Samping Sport Center Telkom University" },
   { name: "Parkiran Mobil (Sport Center)", position: [-6.9722222222, 107.6295555556], kind: "Building", address: "Sebelah Parkiran Motor Sport Center" },
 ];
 
 export { CAMPUS_ROAD_NODES, CAMPUS_ROAD_EDGES };
 
-/** Ray-casting algorithm to determine if a coordinate is within a polygon boundary */
 function isInsidePolygon(point, vs) {
   const x = point[0];
   const y = point[1];
@@ -94,7 +87,6 @@ function isInsidePolygon(point, vs) {
   return inside;
 }
 
-// Pre-classify all road nodes: 1 if inside campus boundary, 0 if outside
 const IS_INSIDE_ROAD_NODE = new Uint8Array(CAMPUS_ROAD_NODES.length);
 for (let i = 0; i < CAMPUS_ROAD_NODES.length; i++) {
   if (isInsidePolygon(CAMPUS_ROAD_NODES[i], TELKOM_BOUNDARY)) {
@@ -102,7 +94,6 @@ for (let i = 0; i < CAMPUS_ROAD_NODES.length; i++) {
   }
 }
 
-// Pre-build internal-only adjacency graph so campus navigation never exits perimeter
 const INTERNAL_ROAD_ADJACENCY = Array.from({ length: CAMPUS_ROAD_NODES.length }, () => []);
 for (let i = 0; i < CAMPUS_ROAD_EDGES.length; i++) {
   const [u, v] = CAMPUS_ROAD_EDGES[i];
@@ -117,7 +108,6 @@ for (let i = 0; i < CAMPUS_ROAD_EDGES.length; i++) {
   }
 }
 
-/** MinHeap priority queue for sub-millisecond Dijkstra pathfinding */
 class MinHeap {
   constructor() {
     this.heap = [];
@@ -191,15 +181,10 @@ function findNearestInsideRoadNode(point) {
   return { id: nearest, dist: minDist };
 }
 
-/**
- * Calculates shortest walking route strictly following campus paved roads and footpaths.
- * Confined 100% within the campus boundary to keep routes on internal walkways.
- */
 function findCampusRoute(from, to) {
   const start = findNearestInsideRoadNode(from);
   const end = findNearestInsideRoadNode(to);
   if (start.id === -1 || end.id === -1) return null;
-  // If either point is too far from campus (> ~1.5 km), don't use campus graph
   if (start.dist > 0.015 || end.dist > 0.015) return null;
 
   const N = CAMPUS_ROAD_NODES.length;
@@ -229,7 +214,6 @@ function findCampusRoute(from, to) {
 
   if (dist[end.id] === Infinity) return null;
 
-  // Reconstruct path along real paved roads inside campus
   const path = [];
   let cur = end.id;
   while (cur !== -1) {
@@ -238,9 +222,7 @@ function findCampusRoute(from, to) {
   }
   path.reverse();
 
-  // Assemble full path: from -> road nodes -> to
   const raw = [from, ...path, to];
-  // Deduplicate consecutive points that are extremely close (< ~1 meter)
   const cleaned = [];
   for (let i = 0; i < raw.length; i++) {
     if (cleaned.length === 0) {
@@ -255,7 +237,6 @@ function findCampusRoute(from, to) {
   return cleaned;
 }
 
-/** Bearing in degrees from point A to B */
 function bearingTo([lat1, lng1], [lat2, lng2]) {
   const toRad = (d) => (d * Math.PI) / 180;
   const toDeg = (r) => (r * 180) / Math.PI;
@@ -265,7 +246,6 @@ function bearingTo([lat1, lng1], [lat2, lng2]) {
   return (toDeg(Math.atan2(y, x)) + 360) % 360;
 }
 
-/** Create a rotatable arrow marker via DivIcon */
 function createArrowIcon(L, heading) {
   return L.divIcon({
     className: "heading-arrow",
@@ -275,7 +255,6 @@ function createArrowIcon(L, heading) {
   });
 }
 
-/** Create pulsating user location marker */
 function createUserMarker(L, position, popupText) {
   const icon = L.divIcon({
     className: "user-location-pin",
@@ -286,7 +265,6 @@ function createUserMarker(L, position, popupText) {
   return L.marker(position, { icon, zIndexOffset: 1000 }).bindPopup(`<strong>${popupText}</strong>`);
 }
 
-/** Create glowing destination marker */
 function createDestinationMarker(L, position, title, subtitle) {
   const icon = L.divIcon({
     className: "dest-location-pin",
@@ -320,9 +298,7 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
     onSelectPlaceRef.current = onSelectPlace;
   });
 
-  // Clean route layers
   const clearRoute = useCallback(() => {
-    // Remove main route line and any extra legs
     if (routeLine.current) {
       routeLine.current.remove();
       if (routeLine.current._extraLegs) {
@@ -361,7 +337,6 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
     }
   }, []);
 
-  // Init map
   useEffect(() => {
     if (!mapElement.current || map.current) return undefined;
     let disposed = false;
@@ -439,9 +414,8 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
     };
   }, []);
 
-  // Start watching position continuously
   const startWatchingPosition = useCallback(() => {
-    if (watchId.current != null) return; // already watching
+    if (watchId.current != null) return;
     if (!navigator.geolocation) return;
     watchId.current = navigator.geolocation.watchPosition(
       ({ coords }) => {
@@ -455,10 +429,8 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
     );
   }, []);
 
-  // Rotates heading arrow to show compass direction
   useEffect(() => {
     function onOrientation(e) {
-      // alpha = compass heading (0=north). webkitCompassHeading for iOS
       const heading = e.webkitCompassHeading ?? (e.alpha != null ? (360 - e.alpha) % 360 : null);
       if (heading == null || !map.current || !userPos.current) return;
 
@@ -474,11 +446,8 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
       });
     }
 
-    // Prefer absolute orientation
     if (typeof window !== "undefined" && "DeviceOrientationEvent" in window) {
-      // iOS 13+ needs permission
       if (typeof DeviceOrientationEvent.requestPermission === "function") {
-        // We'll request on user gesture (locateStudent or navigate)
       } else {
         window.addEventListener("deviceorientationabsolute", onOrientation, true);
         window.addEventListener("deviceorientation", onOrientation);
@@ -494,16 +463,14 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
     };
   }, []);
 
-  // Navigation: draw route from user to target
   useEffect(() => {
     if (!navigateTo || !map.current) return;
 
     async function navigate() {
       setLocationMessage("Mencari lokasi kamu...");
 
-      // Request device orientation permission on iOS if needed
       if (typeof DeviceOrientationEvent?.requestPermission === "function") {
-        try { await DeviceOrientationEvent.requestPermission(); } catch { /* user denied */ }
+        try { await DeviceOrientationEvent.requestPermission(); } catch { }
         if (headingListenerRef.current) {
           window.addEventListener("deviceorientationabsolute", headingListenerRef.current, true);
           window.addEventListener("deviceorientation", headingListenerRef.current);
@@ -522,19 +489,16 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
 
           clearRoute();
 
-          // Calculate multimodal route with legs
           const mode = navigateTo.mode || "walk";
           const entryGate = navigateTo.gate || null;
           const routeResult = await buildMultimodalRoute(from, to, mode, findCampusRoute, entryGate);
 
           const { coords: routeCoords, legs, parkingUsed, entryGateUsed } = routeResult;
 
-          // Fallback if no route coords
           if (!routeCoords || routeCoords.length < 2) {
             routeCoords = [from, to];
           }
 
-          // Draw each leg with different styling
           if (legs && legs.length > 0) {
             legs.forEach((leg, idx) => {
               const isDrive = leg.mode === "drive";
@@ -547,17 +511,14 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
                 lineCap: "round",
                 className: "animated-route-line",
               }).addTo(map.current);
-              // Store for cleanup - we'll use routeLine for the first leg, create refs for others
               if (idx === 0) {
                 routeLine.current = polyline;
               } else {
-                // Store additional polylines on routeLine as array
                 if (!routeLine.current._extraLegs) routeLine.current._extraLegs = [];
                 routeLine.current._extraLegs.push(polyline);
               }
             });
           } else {
-            // Single polyline fallback
             routeLine.current = L.polyline(routeCoords, {
               color: mode === "motor" || mode === "car" ? "#255d6e" : "#c45030",
               weight: 5,
@@ -568,11 +529,9 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
             }).addTo(map.current);
           }
 
-          // User location marker with radar pulse
           if (locationMarker.current) locationMarker.current.remove();
           locationMarker.current = createUserMarker(L, from, "Kamu di sini").addTo(map.current).openPopup();
 
-          // Entry gate marker if applicable
           if (entryGateUsed) {
             const gIcon = L.divIcon({
               className: "gate-location-pin",
@@ -586,7 +545,6 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
               .bindPopup(`<strong>${entryGateUsed.name}</strong><br/>Gerbang masuk kendaraan.`);
           }
 
-          // Parking marker if applicable
           if (parkingUsed) {
             const pIcon = L.divIcon({
               className: "parking-location-pin",
@@ -599,10 +557,8 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
               .bindPopup(`<strong>${parkingUsed.name}</strong><br/>Parkir kendaraan di sini, lanjut jalan kaki.`);
           }
 
-          // Destination marker with animated glow
           destMarker.current = createDestinationMarker(L, to, navigateTo.name, "Tujuanmu").addTo(map.current);
 
-          // Bounce animation on destination marker after route renders
           setTimeout(() => {
             if (destMarker.current && destMarker.current._icon) {
               const iconEl = destMarker.current._icon;
@@ -614,11 +570,9 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
             }
           }, 600);
 
-          // Fit view to entire route with comfortable padding
           const bounds = L.latLngBounds(routeCoords);
           map.current.fitBounds(bounds, { padding: [60, 60], maxZoom: 18 });
 
-          // Calculate total distance (sum of all legs)
           let totalDist = 0;
           for (let i = 0; i < routeCoords.length - 1; i++) {
             totalDist += map.current.distance(L.latLng(routeCoords[i]), L.latLng(routeCoords[i + 1]));
@@ -626,7 +580,6 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
           const nextStep = routeCoords[1] || to;
           const bearing = bearingTo(from, nextStep);
 
-          // Build descriptive nav info
           let destLabel = navigateTo.name;
           const parts = [];
           if (entryGateUsed) parts.push(`Gerbang: ${entryGateUsed.name}`);
@@ -654,7 +607,6 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
       return;
     }
 
-    // iOS orientation permission on user gesture
     if (typeof DeviceOrientationEvent?.requestPermission === "function") {
       DeviceOrientationEvent.requestPermission().catch(() => {});
       if (headingListenerRef.current) {

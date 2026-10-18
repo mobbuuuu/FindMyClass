@@ -91,7 +91,6 @@ export default function WelcomePanel({ onComplete, onStartExplore }) {
         <div className="video-overlay" aria-hidden="true" />
       </div>
 
-      {/* Layer 1: Hero — fixed to viewport center-left, out of scroll flow */}
       <div className={`welcome-hero-layer ${isScrolled ? "scrolled-out" : ""}`}>
         <p className="welcome-eyebrow">TelyuFinder</p>
         <h1 className="welcome-title">
@@ -116,7 +115,6 @@ export default function WelcomePanel({ onComplete, onStartExplore }) {
       {/* Spacer pushes scroll content below first viewport */}
       <div className="welcome-scroll-spacer" aria-hidden="true" />
 
-      {/* Layer 2: Committers — in scroll flow, fades in on scroll */}
       <div className={`committers-layer ${isScrolled ? "scrolled-in" : ""}`} aria-label="Daftar kontributor">
         <h2 className="committers-title">Committers</h2>
         <div className="committers-grid">

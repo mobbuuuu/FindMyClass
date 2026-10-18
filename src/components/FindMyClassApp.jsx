@@ -59,7 +59,6 @@ export default function FindMyClassApp() {
     return CAMPUS_PLACES.filter((p) => cat.kinds.includes(p.kind));
   }, [selectedCategory]);
 
-  // Keyboard navigation: Escape clears search or active modal
   useEffect(() => {
     function handleKeyDown(event) {
       if (event.key === "Escape") {
@@ -95,14 +94,12 @@ export default function FindMyClassApp() {
   }
 
   function handleNavigate(place, mode = "walk") {
-    // For motor/car, show gate picker first
     if (mode === "motor" || mode === "car") {
       setSelectedTransportMode(mode);
       setShowTransportModal(false);
       setShowGatePicker(true);
       return;
     }
-    // For walk/beam, navigate directly
     setNavigateTo({ ...place, mode });
     setSelectedPlace(null);
     setShowTransportModal(false);
@@ -128,7 +125,6 @@ export default function FindMyClassApp() {
     mapRef.current?.clearRoute();
   }
 
-  // Animated close handlers with exit transitions
   function closeProfile() {
     setShowProfileExiting(true);
     setTimeout(() => {
