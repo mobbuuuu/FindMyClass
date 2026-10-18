@@ -32,12 +32,16 @@ const TELKOM_BOUNDARY = [
 export const CAMPUS_PLACES = [
   // 1-6: Utama
   { name: "Asrama Putra", position: [-6.9711944444, 107.6287777778], kind: "Dormitory" }, // 6°58'16.3"S 107°37'43.6"E
-  { name: "Sport Center", position: [-6.97245, 107.6289], kind: "Sports" }, // 6°58'20.8"S 107°37'44.0"E
+  { name: "Sport Center", position: [-6.971617, 107.628700], kind: "Sports" },
   { name: "Asrama Putri", position: [-6.9743055556, 107.6290555556], kind: "Dormitory" }, // 6°58'27.5"S 107°37'44.6"E
   { name: "Tel-U Coffee", position: [-6.9731388889, 107.6293055556], kind: "Cafe" }, // 6°58'23.3"S 107°37'45.5"E
   { name: "Telkom University Library, Study Space", position: [-6.971760334262225, 107.6324196103809], kind: "Study space" }, // 6°58'19.3"S 107°37'55.9"E
   { name: "Telkom University Campus", position: [-6.9729166667, 107.6300000000], kind: "Campus" }, // 6°58'22.5"S 107°37'48.0"E
   { name: "Telkom University Landmark Tower (TULT)", position: [-6.968949, 107.628111], kind: "Building" },
+  { name: "Bandung Techno Park", position: [-6.970428, 107.630277], kind: "Landmark" },
+  { name: "Lesehan Hijau", position: [-6.974359, 107.629813], kind: "Landmark" },
+  { name: "PAUD Telkom", position: [-6.975123, 107.632391], kind: "Building" },
+  { name: "Taman Telkom", position: [-6.974424, 107.632134], kind: "Landmark" },
 
   // Tambahan 1-6
   { name: "Fakultas Komunikasi dan Ilmu Sosial", position: [-6.972002173916829, 107.63281880706629], kind: "Faculty" }, // 6°58'19.8"S 107°37'57.7"E
