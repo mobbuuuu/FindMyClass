@@ -292,7 +292,7 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
   const activeMarkerRef = useRef(null);
   const [locationMessage, setLocationMessage] = useState("");
   const [isLocating, setIsLocating] = useState(false);
-  const [navInfo, setNavInfo] = useState(null); // { distance, bearing, destName }
+  const [navInfo, setNavInfo] = useState(null);
 
   useEffect(() => {
     onSelectPlaceRef.current = onSelectPlace;

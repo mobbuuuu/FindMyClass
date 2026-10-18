@@ -179,7 +179,6 @@ export default function FindMyClassApp() {
         onSelectPlace={handleSelectPlace}
       />
 
-      {/* Floating Top Navigation Header */}
       <header className="top-nav-stack">
         <nav className="liquid-menu" aria-label="Navigasi peta">
           <Brand />
@@ -246,7 +245,6 @@ export default function FindMyClassApp() {
           </button>
         </nav>
 
-        {/* Category Filter Chips Bar */}
         <div className="category-chips-bar" role="toolbar" aria-label="Kategori fasilitas kampus">
           {CATEGORIES.map((cat) => (
             <button
@@ -262,7 +260,6 @@ export default function FindMyClassApp() {
           ))}
         </div>
 
-        {/* Quick items list when a specific category is selected */}
         {categoryPlaces.length > 0 && (
           <div className="category-places-strip" role="listbox" aria-label="Daftar gedung dalam kategori">
             {categoryPlaces.map((place) => (
@@ -280,7 +277,6 @@ export default function FindMyClassApp() {
         )}
       </header>
 
-      {/* Search results dropdown */}
       {query.trim() && (
         <div className="search-results-dropdown" role="listbox" aria-label="Hasil pencarian">
           {searchResults.length === 0 ? (
@@ -310,7 +306,6 @@ export default function FindMyClassApp() {
         </div>
       )}
 
-      {/* Interactive Place Preview Card (Bottom Center) */}
       {selectedPlace && !navigateTo && (
         <section className="place-preview-card" role="dialog" aria-label={`Detail lokasi ${selectedPlace.name}`}>
           <div className="place-preview-header">
@@ -353,7 +348,6 @@ export default function FindMyClassApp() {
         </section>
       )}
 
-      {/* Modal / Dialog Pemilihan Moda Transportasi Kampus */}
       {selectedPlace && (showTransportModal || showTransportExiting) && !navigateTo && (
         <section className={`transport-modal-card ${showTransportExiting ? 'exiting' : ''}`} role="dialog" aria-label="Pilih Moda Transportasi">
           <div className="transport-modal-header">
@@ -423,7 +417,6 @@ export default function FindMyClassApp() {
         </section>
       )}
 
-      {/* Gate Picker Modal (for Motor/Mobil Pribadi) */}
       {selectedPlace && (showGatePicker || showGateExiting) && !navigateTo && (
         <section className={`transport-modal-card ${showGateExiting ? 'exiting' : ''}`} role="dialog" aria-label="Pilih Gerbang Masuk">
           <div className="transport-modal-header">
@@ -460,7 +453,6 @@ export default function FindMyClassApp() {
         </section>
       )}
 
-      {/* Saved Places Tab Panel */}
       {activeTab === "Saved" && (
         <section className="saved-places-panel" aria-label="Lokasi tersimpan">
           <div className="saved-header">
@@ -530,7 +522,6 @@ export default function FindMyClassApp() {
         </section>
       )}
 
-      {/* Profile Card Popover */}
       {(showProfile || showProfileExiting) && (
         <section className={`profile-card-popover ${showProfileExiting ? 'exiting' : ''}`} aria-label="Informasi profil">
           <div className="profile-card-header">

@@ -112,7 +112,6 @@ export default function WelcomePanel({ onComplete, onStartExplore }) {
         </button>
       </div>
 
-      {/* Spacer pushes scroll content below first viewport */}
       <div className="welcome-scroll-spacer" aria-hidden="true" />
 
       <div className={`committers-layer ${isScrolled ? "scrolled-in" : ""}`} aria-label="Daftar kontributor">
