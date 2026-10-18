@@ -122,7 +122,7 @@ export default function WelcomePanel({ onComplete, onStartExplore }) {
         <div className="committers-grid">
           <div className="committer-card">
             <div className="committer-avatar">
-              <img src="/welcome/committers/gorga.jpg" alt="Gorga Enrou Rorizky" width="88" height="88" loading="lazy" />
+              <img src="/welcome/committers/gorga.jpeg" alt="Gorga Enrou Rorizky" width="112" height="112" loading="lazy" />
             </div>
             <div className="committer-info">
               <span className="committer-name">Gorga Enrou Rorizky</span>
@@ -132,7 +132,7 @@ export default function WelcomePanel({ onComplete, onStartExplore }) {
 
           <div className="committer-card">
             <div className="committer-avatar">
-              <img src="/welcome/committers/asyraf.jpg" alt="Muhammad Asyraf" width="88" height="88" loading="lazy" />
+              <img src="/welcome/committers/asyraf.jpeg" alt="Muhammad Asyraf" width="112" height="112" loading="lazy" />
             </div>
             <div className="committer-info">
               <span className="committer-name">Muhammad Asyraf</span>
@@ -141,13 +141,11 @@ export default function WelcomePanel({ onComplete, onStartExplore }) {
           </div>
 
           <div className="committer-card">
-            <div className="committer-avatar" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M12 11a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0" />
-              </svg>
+            <div className="committer-avatar">
+              <img src="/welcome/committers/nadhinka.png" alt="Nadhinka Naila Arsy" width="112" height="112" loading="lazy" />
             </div>
             <div className="committer-info">
-              <span className="committer-name">Nadhiska Naila Arsy</span>
+                <span className="committer-name">Nadhinka Naila Arsy</span>
               <span className="committer-role">Visual Communication Design — Visual Designer</span>
             </div>
           </div>

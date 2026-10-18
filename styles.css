@@ -341,7 +341,7 @@ h1 em { color: var(--deep-blue); font-style: normal; }
 
 .committers-title {
   margin: 0 0 24px;
-  font-size: 14.3px;
+  font-size: 22px;
   font-weight: 700;
   letter-spacing: 0.5px;
   color: var(--yellow);
@@ -351,6 +351,7 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+  align-items: stretch;
 }
 
 .committer-card {
@@ -359,7 +360,9 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   align-items: center;
   text-align: center;
   gap: 16px;
-  padding: 24px 20px;
+  min-width: 0;
+  min-height: 286px;
+  padding: 28px 22px 24px;
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(12px);
@@ -374,9 +377,9 @@ h1 em { color: var(--deep-blue); font-style: normal; }
 }
 
 .committer-avatar {
-  width: 88px;
-  height: 88px;
-  min-width: 88px;
+  width: 112px;
+  height: 112px;
+  min-width: 112px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.12);
   border: 2px solid rgba(255, 255, 255, 0.3);
@@ -386,11 +389,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   color: rgba(255, 255, 255, 0.75);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   overflow: hidden;
-}
-
-.committer-avatar svg {
-  width: 44px;
-  height: 44px;
 }
 
 .committer-avatar img {
@@ -405,18 +403,22 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   display: flex;
   flex-direction: column;
   gap: 6px;
+  width: 100%;
+  min-height: 72px;
+  justify-content: flex-start;
 }
 
 .committer-name {
-  font-size: 10.4px;
+  font-size: 17px;
   font-weight: 700;
   color: #fff;
 }
 
 .committer-role {
-  font-size: 8.45px;
+  font-size: 12.5px;
   color: rgba(255, 255, 255, 0.75);
   line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width:480px) {
@@ -427,9 +429,10 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   .video-overlay { background:linear-gradient(180deg, rgba(10,22,40,0.94) 0%, rgba(10,22,40,0.82) 100%); }
   .committers-layer { width: calc(100vw - 40px); padding-top: 16px; }
   .committers-grid { grid-template-columns:1fr; gap:16px; }
-  .committer-avatar { width:72px; height:72px; min-width:72px; }
-  .committer-avatar svg { width:36px; height:36px; }
-  .committer-card { padding:20px 16px; }
+  .committers-title { font-size: 20px; }
+  .committer-avatar { width:88px; height:88px; min-width:88px; }
+  .committer-card { min-height: 0; padding:24px 18px 22px; }
+  .committer-info { min-height: 0; }
 }
 
 /* Full-screen map workspace with a liquid‑glass command capsule. */
