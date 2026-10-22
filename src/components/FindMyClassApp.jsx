@@ -1,5 +1,5 @@
-import { useState, useRef, useMemo, useEffect } from "react";
-import CampusMap, { CAMPUS_PLACES } from "./CampusMap.jsx";
+import { useState, useRef, useMemo, useEffect, useCallback } from "react";
+import CampusMap, { CAMPUS_PLACES, getHaversineDistance, formatDistance, formatWalkTime, getPlaceStatus, getKindColor } from "./CampusMap.jsx";
 
 const CATEGORIES = [
   { id: "all", label: "Semua" },
@@ -8,6 +8,7 @@ const CATEGORIES = [
   { id: "gate", label: "Gerbang", kinds: ["Gate"] },
   { id: "dorm_food", label: "Asrama & Makan", kinds: ["Dormitory", "Cafe", "Food Court", "Canteen"] },
   { id: "facility", label: "Fasilitas & Ibadah", kinds: ["Mosque", "Hall", "Building", "Study space", "Sports", "Landmark", "Campus"] },
+  { id: "beam", label: "BEAM Dock", kinds: ["BeamDock"] },
 ];
 
 function Brand() {
@@ -21,6 +22,23 @@ function Brand() {
 
 import WelcomePanel from "./WelcomePanel.jsx";
 
+/** Read recent places from localStorage */
+function loadRecentPlaces() {
+  try {
+    const raw = localStorage.getItem("telyu_recent_places");
+    if (!raw) return [];
+    const names = JSON.parse(raw);
+    return names.map((n) => CAMPUS_PLACES.find((p) => p.name === n)).filter(Boolean).slice(0, 5);
+  } catch { return []; }
+}
+
+/** Save recent places to localStorage (store names only) */
+function saveRecentPlaces(places) {
+  try {
+    localStorage.setItem("telyu_recent_places", JSON.stringify(places.map((p) => p.name)));
+  } catch { /* quota or private mode */ }
+}
+
 export default function FindMyClassApp() {
   const [showWelcome, setShowWelcome] = useState(true);
   const [mapTransitioning, setMapTransitioning] = useState(false);
@@ -30,6 +48,7 @@ export default function FindMyClassApp() {
   const [activeTab, setActiveTab] = useState("Explore");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedPlace, setSelectedPlace] = useState(null);
+  const [showPlaceExiting, setShowPlaceExiting] = useState(false);
   const [navigateTo, setNavigateTo] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
   const [showProfileExiting, setShowProfileExiting] = useState(false);
@@ -43,21 +62,73 @@ export default function FindMyClassApp() {
     CAMPUS_PLACES.find((p) => p.name.includes("Library")) || CAMPUS_PLACES[1],
   ].filter(Boolean));
   const mapRef = useRef(null);
+  const [userLocation, setUserLocation] = useState(null);
+  const [recentPlaces, setRecentPlaces] = useState([]);
+  const [shareCopied, setShareCopied] = useState(false);
+
+  // Load recent places from localStorage on mount
+  useEffect(() => {
+    setRecentPlaces(loadRecentPlaces());
+  }, []);
+
+  // URL deep linking: ?place=PlaceName
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const placeName = params.get("place");
+    if (placeName) {
+      const decoded = decodeURIComponent(placeName);
+      const match = CAMPUS_PLACES.find(
+        (p) => p.name === decoded || p.aliases?.some((a) => a.toLowerCase() === decoded.toLowerCase()),
+      );
+      if (match) {
+        // Delay to let map mount
+        setTimeout(() => {
+          setSelectedPlace(match);
+          setShowWelcome(false);
+          mapRef.current?.panToPlace(match);
+        }, 800);
+      }
+    }
+  }, []);
+
+  const handleUserLocationChange = useCallback((pos) => {
+    setUserLocation(pos);
+  }, []);
 
   const searchResults = useMemo(() => {
     if (!query.trim()) return [];
     const q = query.toLowerCase();
-    return CAMPUS_PLACES.filter(
-      (p) => p.name.toLowerCase().includes(q) || p.kind.toLowerCase().includes(q),
+    const results = CAMPUS_PLACES.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.kind.toLowerCase().includes(q) ||
+        p.aliases?.some((a) => a.toLowerCase().includes(q)),
     );
-  }, [query]);
+    // Sort by distance if user location available
+    if (userLocation) {
+      results.sort((a, b) => getHaversineDistance(userLocation, a.position) - getHaversineDistance(userLocation, b.position));
+    }
+    return results;
+  }, [query, userLocation]);
 
   const categoryPlaces = useMemo(() => {
     if (selectedCategory === "all") return [];
     const cat = CATEGORIES.find((c) => c.id === selectedCategory);
     if (!cat || !cat.kinds) return [];
-    return CAMPUS_PLACES.filter((p) => cat.kinds.includes(p.kind));
-  }, [selectedCategory]);
+    const results = CAMPUS_PLACES.filter((p) => cat.kinds.includes(p.kind));
+    if (userLocation) {
+      results.sort((a, b) => getHaversineDistance(userLocation, a.position) - getHaversineDistance(userLocation, b.position));
+    }
+    return results;
+  }, [selectedCategory, userLocation]);
+
+  function closePlacePreview() {
+    setShowPlaceExiting(true);
+    setTimeout(() => {
+      setSelectedPlace(null);
+      setShowPlaceExiting(false);
+    }, 220);
+  }
 
   // Keyboard navigation: Escape clears search or active modal
   useEffect(() => {
@@ -68,7 +139,7 @@ export default function FindMyClassApp() {
         } else if (navigateTo) {
           handleNavigationEnd();
         } else if (selectedPlace) {
-          setSelectedPlace(null);
+          closePlacePreview();
         } else if (selectedCategory !== "all") {
           setSelectedCategory("all");
         } else if (showProfile) {
@@ -92,6 +163,13 @@ export default function FindMyClassApp() {
   function handleSelectPlace(place) {
     setSelectedPlace(place);
     mapRef.current?.panToPlace(place);
+    // Update recent places
+    setRecentPlaces((prev) => {
+      const filtered = prev.filter((p) => p.name !== place.name);
+      const updated = [place, ...filtered].slice(0, 5);
+      saveRecentPlaces(updated);
+      return updated;
+    });
   }
 
   function handleNavigate(place, mode = "walk") {
@@ -164,6 +242,14 @@ export default function FindMyClassApp() {
     });
   }
 
+  function sharePlace(place) {
+    const url = `${window.location.origin}${window.location.pathname}?place=${encodeURIComponent(place.name)}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    }).catch(() => {});
+  }
+
   return (
     <>
       {showWelcome && (
@@ -171,7 +257,10 @@ export default function FindMyClassApp() {
           onStartExplore={() => setMapTransitioning(true)}
           onComplete={() => {
             setShowWelcome(false);
-            setTimeout(() => setMapTransitioning(false), 1000);
+            setTimeout(() => {
+              setMapTransitioning(false);
+              mapRef.current?.invalidateSize();
+            }, 1000);
           }}
         />
       )}
@@ -181,6 +270,7 @@ export default function FindMyClassApp() {
         navigateTo={navigateTo}
         onNavigationEnd={handleNavigationEnd}
         onSelectPlace={handleSelectPlace}
+        onUserLocationChange={handleUserLocationChange}
       />
 
       {/* Floating Top Navigation Header */}
@@ -276,7 +366,28 @@ export default function FindMyClassApp() {
                 className="category-place-pill"
                 onClick={() => handleSelectPlace(place)}
               >
-                <span className="pill-dot" aria-hidden="true" />
+                <span className="pill-dot" style={{ background: getKindColor(place.kind) }} aria-hidden="true" />
+                <span>{place.name}</span>
+                {userLocation && (
+                  <span className="pill-distance">{formatDistance(getHaversineDistance(userLocation, place.position))}</span>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Recent Places Strip */}
+        {recentPlaces.length > 0 && !query.trim() && selectedCategory === "all" && !selectedPlace && !navigateTo && (
+          <div className="recent-places-strip" aria-label="Riwayat terakhir">
+            <span className="recent-label">Terakhir</span>
+            {recentPlaces.map((place) => (
+              <button
+                key={place.name}
+                type="button"
+                className="category-place-pill"
+                onClick={() => handleSelectPlace(place)}
+              >
+                <span className="pill-dot" style={{ background: getKindColor(place.kind) }} aria-hidden="true" />
                 <span>{place.name}</span>
               </button>
             ))}
@@ -305,7 +416,7 @@ export default function FindMyClassApp() {
                 <span className="search-result-icon" aria-hidden="true">⌖</span>
                 <div className="search-result-text">
                   <strong>{place.name}</strong>
-                  <span>{place.kind}</span>
+                  <span>{place.kind}{userLocation ? ` · ${formatDistance(getHaversineDistance(userLocation, place.position))}` : ""}</span>
                 </div>
                 <span className="search-result-go" aria-hidden="true">→</span>
               </button>
@@ -315,20 +426,38 @@ export default function FindMyClassApp() {
       )}
 
       {/* Interactive Place Preview Card (Bottom Center) */}
-      {selectedPlace && !navigateTo && (
-        <section className="place-preview-card" role="dialog" aria-label={`Detail lokasi ${selectedPlace.name}`}>
+      {(selectedPlace || showPlaceExiting) && !navigateTo && (() => {
+        const place = selectedPlace;
+        if (!place) return null;
+        const status = getPlaceStatus(place.hours);
+        const dist = userLocation ? getHaversineDistance(userLocation, place.position) : null;
+        return (
+        <section className={`place-preview-card ${showPlaceExiting ? "exiting" : ""}`} role="dialog" aria-label={`Detail lokasi ${place.name}`}>
           <div className="place-preview-header">
             <div>
-              <span className="place-kind-badge">{selectedPlace.kind}</span>
-              <h2 className="place-name">{selectedPlace.name}</h2>
-              {selectedPlace.address && (
-                <p className="place-address">{selectedPlace.address}</p>
+              <div className="place-badge-row">
+                <span className="place-kind-badge" style={{ "--badge-color": getKindColor(place.kind) }}>{place.kind}</span>
+                {place.floors && <span className="place-meta-badge">🏢 {place.floors}</span>}
+                {status && (
+                  <span className={`place-status-pill ${status.isOpen ? "open" : "closed"}`}>
+                    <span className="status-dot" aria-hidden="true" />
+                    <span>{status.isOpen ? "Buka" : "Tutup"}</span>
+                    <span className="status-hours">({status.text})</span>
+                  </span>
+                )}
+              </div>
+              <h2 className="place-name">{place.name}</h2>
+              {place.address && (
+                <p className="place-address">{place.address}</p>
+              )}
+              {dist !== null && (
+                <p className="place-distance-info">🚶 {formatDistance(dist)} · {formatWalkTime(dist)}</p>
               )}
             </div>
             <button
               type="button"
               className="place-close-btn"
-              onClick={() => setSelectedPlace(null)}
+              onClick={closePlacePreview}
               aria-label="Tutup pratinjau lokasi"
             >
               ×
@@ -339,23 +468,33 @@ export default function FindMyClassApp() {
               type="button"
               className="btn-start-route"
               onClick={() => setShowTransportModal(true)}
-              aria-label={`Pilih moda rute ke ${selectedPlace.name}`}
+              aria-label={`Pilih moda rute ke ${place.name}`}
             >
               <span aria-hidden="true">➔</span>
               <span>Mulai Rute</span>
             </button>
             <button
               type="button"
-              className={`btn-save-place ${savedPlaces.some((p) => p.name === selectedPlace.name) ? "saved" : ""}`}
-              onClick={() => toggleSavePlace(selectedPlace)}
-              aria-label={savedPlaces.some((p) => p.name === selectedPlace.name) ? "Hapus dari tersimpan" : "Simpan lokasi"}
+              className={`btn-save-place ${savedPlaces.some((p) => p.name === place.name) ? "saved" : ""}`}
+              onClick={() => toggleSavePlace(place)}
+              aria-label={savedPlaces.some((p) => p.name === place.name) ? "Hapus dari tersimpan" : "Simpan lokasi"}
             >
-              <span aria-hidden="true">{savedPlaces.some((p) => p.name === selectedPlace.name) ? "★" : "♡"}</span>
-              <span>{savedPlaces.some((p) => p.name === selectedPlace.name) ? "Tersimpan" : "Simpan"}</span>
+              <span aria-hidden="true">{savedPlaces.some((p) => p.name === place.name) ? "★" : "♡"}</span>
+              <span>{savedPlaces.some((p) => p.name === place.name) ? "Tersimpan" : "Simpan"}</span>
+            </button>
+            <button
+              type="button"
+              className="btn-share-place"
+              onClick={() => sharePlace(place)}
+              aria-label="Bagikan tautan lokasi"
+            >
+              <span aria-hidden="true">↗</span>
+              <span>{shareCopied ? "Disalin!" : "Bagikan"}</span>
             </button>
           </div>
         </section>
-      )}
+        );
+      })()}
 
       {/* Modal / Dialog Pemilihan Moda Transportasi Kampus */}
       {selectedPlace && (showTransportModal || showTransportExiting) && !navigateTo && (
@@ -581,6 +720,12 @@ export default function FindMyClassApp() {
           >
             Akhiri ✕
           </button>
+        </div>
+      )}
+
+      {shareCopied && (
+        <div className="share-feedback-toast" role="status">
+          ✓ Tautan lokasi berhasil disalin ke papan klip!
         </div>
       )}
     </main>

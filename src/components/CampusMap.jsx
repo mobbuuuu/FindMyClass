@@ -31,48 +31,117 @@ const TELKOM_BOUNDARY = [
 ];
 export const CAMPUS_PLACES = [
   // 1-6: Utama
-  { name: "Asrama Putra", position: [-6.9711944444, 107.6287777778], kind: "Dormitory" }, // 6°58'16.3"S 107°37'43.6"E
-  { name: "Sport Center", position: [-6.97245, 107.6289], kind: "Sports" }, // 6°58'20.8"S 107°37'44.0"E
-  { name: "Asrama Putri", position: [-6.9743055556, 107.6290555556], kind: "Dormitory" }, // 6°58'27.5"S 107°37'44.6"E
-  { name: "Tel-U Coffee", position: [-6.9731388889, 107.6293055556], kind: "Cafe" }, // 6°58'23.3"S 107°37'45.5"E
-  { name: "Telkom University Library, Study Space", position: [-6.971760334262225, 107.6324196103809], kind: "Study space" }, // 6°58'19.3"S 107°37'55.9"E
-  { name: "Telkom University Campus", position: [-6.9729166667, 107.6300000000], kind: "Campus" }, // 6°58'22.5"S 107°37'48.0"E
-  { name: "Telkom University Landmark Tower (TULT)", position: [-6.968949, 107.628111], kind: "Building" },
+  { name: "Asrama Putra", position: [-6.9711944444, 107.6287777778], kind: "Dormitory", aliases: ["Asrama Putra", "Dorm Putra"] },
+  { name: "Sport Center", position: [-6.97245, 107.6289], kind: "Sports", aliases: ["SC", "Olahraga"], hours: { open: "06:00", close: "21:00", text: "06:00 - 21:00" } },
+  { name: "Asrama Putri", position: [-6.9743055556, 107.6290555556], kind: "Dormitory", aliases: ["Asrama Putri", "Dorm Putri"] },
+  { name: "Tel-U Coffee", position: [-6.9731388889, 107.6293055556], kind: "Cafe", aliases: ["Coffee", "Kopi"], hours: { open: "08:00", close: "21:00", text: "08:00 - 21:00" } },
+  { name: "Telkom University Library, Study Space", position: [-6.971760334262225, 107.6324196103809], kind: "Study space", aliases: ["Perpus", "Library", "Perpustakaan"], floors: "4 Lantai", hours: { open: "08:00", close: "18:00", text: "08:00 - 18:00" } },
+  { name: "Telkom University Campus", position: [-6.9729166667, 107.6300000000], kind: "Campus", aliases: ["Tel-U", "Telkom"] },
+  { name: "Telkom University Landmark Tower (TULT)", position: [-6.968949, 107.628111], kind: "Building", aliases: ["TULT", "Tower", "Landmark Tower"], floors: "20 Lantai" },
 
   // Tambahan 1-6
-  { name: "Fakultas Komunikasi dan Ilmu Sosial", position: [-6.972002173916829, 107.63281880706629], kind: "Faculty" }, // 6°58'19.8"S 107°37'57.7"E
-  { name: "Fakultas Ilmu Terapan", position: [-6.9731944444, 107.6326666667], kind: "Faculty" }, // 6°58'23.5"S 107°37'57.6"E
-  { name: "Fakultas Ekonomi dan Bisnis", position: [-6.971336184403436, 107.631943572998], kind: "Faculty" }, // 6°58'17.8"S 107°37'54.9"E
-  { name: "Fakultas Industri Kreatif", position: [-6.9717777778, 107.6315000000], kind: "Faculty" }, // 6°58'18.4"S 107°37'53.4"E
-  { name: "Telkom University Convention Hall", position: [-6.9712777778, 107.6312222222], kind: "Hall" }, // 6°58'16.6"S 107°37'52.4"E
-  { name: "Danau Galau", position: [-6.9731666667, 107.6312777778], kind: "Landmark" }, // 6°58'23.4"S 107°37'52.6"E
+  { name: "Fakultas Komunikasi dan Ilmu Sosial", position: [-6.972002173916829, 107.63281880706629], kind: "Faculty", aliases: ["FKIS", "Komunikasi", "Ilmu Sosial"], floors: "4 Lantai" },
+  { name: "Fakultas Ilmu Terapan", position: [-6.9731944444, 107.6326666667], kind: "Faculty", aliases: ["FIT", "Ilmu Terapan"], floors: "4 Lantai" },
+  { name: "Fakultas Ekonomi dan Bisnis", position: [-6.971336184403436, 107.631943572998], kind: "Faculty", aliases: ["FEB", "Ekonomi", "Bisnis"], floors: "4 Lantai" },
+  { name: "Fakultas Industri Kreatif", position: [-6.9717777778, 107.6315000000], kind: "Faculty", aliases: ["FIK", "Industri Kreatif"], floors: "4 Lantai" },
+  { name: "Telkom University Convention Hall", position: [-6.9712777778, 107.6312222222], kind: "Hall", aliases: ["Convention Hall", "Aula"] },
+  { name: "Danau Galau", position: [-6.9731666667, 107.6312777778], kind: "Landmark", aliases: ["Danau", "Lake"] },
 
   // Tambahan 7-9: GKU
-  { name: "Gedung Kuliah Umum 1", position: [-6.974390859546471, 107.63106844734378], kind: "Lecture", address: "Jl. Telekomunikasi, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257" },
-  { name: "Gedung Kuliah Umum 2", position: [-6.9748408361847485, 107.63105842897347], kind: "Lecture" },
-  { name: "Gedung Kuliah Umum 3", position: [-6.972866066219806, 107.6298691237254], kind: "Lecture" },
+  { name: "Gedung Kuliah Umum 1", position: [-6.974390859546471, 107.63106844734378], kind: "Lecture", address: "Jl. Telekomunikasi, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257", aliases: ["GKU 1", "GKU1", "Kuliah Umum 1"], floors: "4 Lantai" },
+  { name: "Gedung Kuliah Umum 2", position: [-6.9748408361847485, 107.63105842897347], kind: "Lecture", aliases: ["GKU 2", "GKU2", "Kuliah Umum 2"], floors: "4 Lantai" },
+  { name: "Gedung Kuliah Umum 3", position: [-6.972866066219806, 107.6298691237254], kind: "Lecture", aliases: ["GKU 3", "GKU3", "Kuliah Umum 3"], floors: "4 Lantai" },
 
   // Tambahan 10-15
-  { name: "Food Court Asrama Putri", position: [-6.9741944444, 107.6292777778], kind: "Food Court" }, // 6°58'27.1"S 107°37'45.4"E
-  { name: "Kantin Putri", position: [-6.974439793270318, 107.6287960878003], kind: "Canteen" },
-  { name: "Fakultas Teknik Elektro", position: [-6.975473686188717, 107.6295071364736], kind: "Faculty" },
-  { name: "Fakultas Informatika", position: [-6.9758309689279425, 107.63069039465188], kind: "Faculty" },
-  { name: "Gedung Serba guna", position: [-6.9763885581062715, 107.63028949108872], kind: "Hall" },
-  { name: "Masjid Syamsul Ulum", position: [-6.975699272034128, 107.6321904194122], kind: "Mosque" },
+  { name: "Food Court Asrama Putri", position: [-6.9741944444, 107.6292777778], kind: "Food Court", aliases: ["Food Court", "Foodcourt"], hours: { open: "07:00", close: "20:00", text: "07:00 - 20:00" } },
+  { name: "Kantin Putri", position: [-6.974439793270318, 107.6287960878003], kind: "Canteen", aliases: ["Kantin"], hours: { open: "07:00", close: "20:00", text: "07:00 - 20:00" } },
+  { name: "Fakultas Teknik Elektro", position: [-6.975473686188717, 107.6295071364736], kind: "Faculty", aliases: ["FTE", "Teknik Elektro"], floors: "4 Lantai" },
+  { name: "Fakultas Informatika", position: [-6.9758309689279425, 107.63069039465188], kind: "Faculty", aliases: ["FRI", "Informatika", "IF"], floors: "4 Lantai" },
+  { name: "Gedung Serba guna", position: [-6.9763885581062715, 107.63028949108872], kind: "Hall", aliases: ["GSG", "Serba Guna", "Serbaguna"] },
+  { name: "Masjid Syamsul Ulum", position: [-6.975699272034128, 107.6321904194122], kind: "Mosque", aliases: ["MSU", "Masjid", "Mushola"], hours: { open: "04:00", close: "22:00", text: "04:00 - 22:00" } },
 
   // Tambahan 16-20: Gates
-  { name: "Gate 1", position: [-6.972076, 107.633449], kind: "Gate", address: "Stt Telkom, Jl. Telekomunikasi Jl. Sukapura, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40267" },
-  { name: "Gate 2", position: [-6.973109, 107.633289], kind: "Gate", address: "2JGM+P8R, Jl. Telekomunikasi, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257" },
-  { name: "Gate 3", position: [-6.974003, 107.632496], kind: "Gate", address: "2JGM+C26, Jl. Telekomunikasi, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257" },
-  { name: "Gate 4", position: [-6.976102, 107.632827], kind: "Gate", address: "Jl. Sukabirus No.72, Sukapura, Kec. Dayeuhkolot, Kota Bandung, Jawa Barat 40257" },
-  { name: "Gate 5", position: [-6.975225, 107.628982], kind: "Gate", address: "2JFH+WH5, Jl. Radio Palasari Road, Citeureup, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257" },
+  { name: "Gate 1", position: [-6.972076, 107.633449], kind: "Gate", address: "Stt Telkom, Jl. Telekomunikasi Jl. Sukapura, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40267", aliases: ["Gerbang 1"] },
+  { name: "Gate 2", position: [-6.973109, 107.633289], kind: "Gate", address: "2JGM+P8R, Jl. Telekomunikasi, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257", aliases: ["Gerbang 2"] },
+  { name: "Gate 3", position: [-6.974003, 107.632496], kind: "Gate", address: "2JGM+C26, Jl. Telekomunikasi, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257", aliases: ["Gerbang 3"] },
+  { name: "Gate 4", position: [-6.976102, 107.632827], kind: "Gate", address: "Jl. Sukabirus No.72, Sukapura, Kec. Dayeuhkolot, Kota Bandung, Jawa Barat 40257", aliases: ["Gerbang 4"] },
+  { name: "Gate 5", position: [-6.975225, 107.628982], kind: "Gate", address: "2JFH+WH5, Jl. Radio Palasari Road, Citeureup, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257", aliases: ["Gerbang 5"] },
 
   // Parkiran Kendaraan Kampus
-  { name: "Parkiran Motor (Sport Center)", position: [-6.9716666667, 107.6295555556], kind: "Building", address: "Samping Sport Center Telkom University" },
-  { name: "Parkiran Mobil (Sport Center)", position: [-6.9722222222, 107.6295555556], kind: "Building", address: "Sebelah Parkiran Motor Sport Center" },
+  { name: "Parkiran Motor (Sport Center)", position: [-6.9716666667, 107.6295555556], kind: "Building", address: "Samping Sport Center Telkom University", aliases: ["Parkiran Motor", "Parkir Motor"] },
+  { name: "Parkiran Mobil (Sport Center)", position: [-6.9722222222, 107.6295555556], kind: "Building", address: "Sebelah Parkiran Motor Sport Center", aliases: ["Parkiran Mobil", "Parkir Mobil"] },
+
+  // BEAM Electric Scooter Docks
+  { name: "Shelter BEAM - Sport Center", position: [-6.9723, 107.6291], kind: "BeamDock", aliases: ["BEAM SC", "Beam Sport Center"] },
+  { name: "Shelter BEAM - GKU", position: [-6.9745, 107.6308], kind: "BeamDock", aliases: ["BEAM GKU"] },
+  { name: "Shelter BEAM - TULT", position: [-6.9691, 107.6283], kind: "BeamDock", aliases: ["BEAM TULT", "Beam Tower"] },
+  { name: "Shelter BEAM - Asrama Putri", position: [-6.9744, 107.6293], kind: "BeamDock", aliases: ["BEAM Asrama"] },
+  { name: "Shelter BEAM - Masjid", position: [-6.9755, 107.6320], kind: "BeamDock", aliases: ["BEAM Masjid", "BEAM MSU"] },
 ];
 
 export { CAMPUS_ROAD_NODES, CAMPUS_ROAD_EDGES };
+
+/** Map place kind to marker fill color */
+const KIND_COLORS = {
+  Lecture: "#c45030",
+  Faculty: "#255d6e",
+  Gate: "#5a4fc4",
+  Dormitory: "#d97706",
+  Cafe: "#d97706",
+  "Food Court": "#d97706",
+  Canteen: "#d97706",
+  Sports: "#16a34a",
+  Landmark: "#16a34a",
+  Campus: "#16a34a",
+  Mosque: "#16a34a",
+  Hall: "#16a34a",
+  "Study space": "#16a34a",
+  Building: "#255d6e",
+  BeamDock: "#0284c7",
+};
+
+export function getKindColor(kind) {
+  return KIND_COLORS[kind] || "#255d6e";
+}
+
+/** Walking time estimate at ~75 m/min */
+export function formatWalkTime(meters) {
+  if (!meters || meters <= 0) return "< 1 mnt";
+  const minutes = Math.round(meters / 75);
+  if (minutes < 1) return "< 1 mnt";
+  return `~${minutes} mnt`;
+}
+
+/** Haversine distance between two [lat, lng] coordinates in meters */
+export function getHaversineDistance([lat1, lon1], [lat2, lon2]) {
+  const R = 6371000;
+  const toRad = (d) => (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+/** Format distance as human-readable string */
+export function formatDistance(meters) {
+  if (meters < 1000) return `${Math.round(meters)} m`;
+  return `${(meters / 1000).toFixed(1)} km`;
+}
+
+/** Check if a facility is open right now (WIB / UTC+7) */
+export function getPlaceStatus(hours) {
+  if (!hours) return null;
+  const now = new Date();
+  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+  const wib = new Date(utc + 3600000 * 7);
+  const currentMinutes = wib.getHours() * 60 + wib.getMinutes();
+  const [openH, openM] = hours.open.split(":").map(Number);
+  const [closeH, closeM] = hours.close.split(":").map(Number);
+  const openMinutes = openH * 60 + openM;
+  const closeMinutes = closeH * 60 + closeM;
+  const isOpen = currentMinutes >= openMinutes && currentMinutes <= closeMinutes;
+  return { isOpen, text: hours.text };
+}
 
 /** Ray-casting algorithm to determine if a coordinate is within a polygon boundary */
 function isInsidePolygon(point, vs) {
@@ -293,7 +362,7 @@ function createDestinationMarker(L, position, title, subtitle) {
   return L.marker(position, { icon, zIndexOffset: 900 }).bindPopup(`<strong>${title}</strong><br/>${subtitle}`);
 }
 
-const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, onSelectPlace }, ref) {
+const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, onSelectPlace, onUserLocationChange }, ref) {
   const mapElement = useRef(null);
   const map = useRef(null);
   const locationMarker = useRef(null);
@@ -337,7 +406,8 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
     headingMarker.current?.remove();
     headingMarker.current = null;
     if (activeMarkerRef.current) {
-      activeMarkerRef.current.setStyle({ radius: 7, fillColor: "#255d6e", weight: 2 });
+      const kindColor = activeMarkerRef.current._kindColor || "#255d6e";
+      activeMarkerRef.current.setStyle({ radius: 7, fillColor: kindColor, weight: 2 });
       activeMarkerRef.current = null;
     }
     setNavInfo(null);
@@ -348,7 +418,8 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
     map.current.flyTo(place.position, 17, { duration: 0.8 });
 
     if (activeMarkerRef.current && activeMarkerRef.current !== placeMarkersRef.current[place.name]) {
-      activeMarkerRef.current.setStyle({ radius: 7, fillColor: "#255d6e", weight: 2 });
+      const prevColor = activeMarkerRef.current._kindColor || "#255d6e";
+      activeMarkerRef.current.setStyle({ radius: 7, fillColor: prevColor, weight: 2 });
     }
     const marker = placeMarkersRef.current[place.name];
     if (marker) {
@@ -395,11 +466,12 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
       campusMap.setMinZoom(14);
 
       CAMPUS_PLACES.forEach((place) => {
+        const fillColor = getKindColor(place.kind);
         const marker = L.circleMarker(place.position, {
           radius: 7,
           color: "#ffffff",
           weight: 2,
-          fillColor: "#255d6e",
+          fillColor,
           fillOpacity: 0.9,
         })
           .addTo(campusMap)
@@ -411,6 +483,7 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
           });
 
         placeMarkersRef.current[place.name] = marker;
+        marker._kindColor = fillColor;
 
         marker.on("click", (e) => {
           L.DomEvent.stopPropagation(e);
@@ -453,6 +526,7 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
     watchId.current = navigator.geolocation.watchPosition(
       ({ coords }) => {
         userPos.current = [coords.latitude, coords.longitude];
+        onUserLocationChange?.([coords.latitude, coords.longitude]);
         if (locationMarker.current) {
           locationMarker.current.setLatLng(userPos.current);
         }
@@ -641,6 +715,7 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
           parts.push("Jalan kaki ke tujuan");
           setNavInfo({
             distance: totalDist < 1000 ? `${Math.round(totalDist)} m` : `${(totalDist / 1000).toFixed(1)} km`,
+            walkTime: formatWalkTime(totalDist),
             bearing: Math.round(bearing),
             destName: parts.join(" → "),
           });
@@ -677,6 +752,7 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
       ({ coords }) => {
         const studentPosition = [coords.latitude, coords.longitude];
         userPos.current = studentPosition;
+        onUserLocationChange?.(studentPosition);
         import("leaflet").then(({ default: L }) => {
           setIsLocating(false);
           if (!map.current) return;
@@ -694,7 +770,12 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
     );
   }, [startWatchingPosition]);
 
-  useImperativeHandle(ref, () => ({ clearRoute, panToPlace, locateStudent }), [clearRoute, panToPlace, locateStudent]);
+  useImperativeHandle(ref, () => ({
+    clearRoute,
+    panToPlace,
+    locateStudent,
+    invalidateSize: () => map.current?.invalidateSize(),
+  }), [clearRoute, panToPlace, locateStudent]);
 
   return (
     <div className="campus-map-shell">
@@ -732,7 +813,7 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
           <span className="nav-arrow" style={{ transform: `rotate(${navInfo.bearing}deg)` }}>↑</span>
           <div>
             <strong>{navInfo.destName}</strong>
-            <span>{navInfo.distance}</span>
+            <span>{navInfo.distance} · {navInfo.walkTime}</span>
           </div>
           <button type="button" className="nav-cancel" onClick={() => { clearRoute(); onNavigationEnd?.(); }} aria-label="Batalkan navigasi">✕</button>
         </div>
