@@ -85,7 +85,7 @@ export default function WelcomePanel({ onComplete, onStartExplore }) {
       aria-modal="true"
     >
       <div className="welcome-video-bg" aria-hidden="true">
-        <video autoPlay muted loop playsInline poster="/welcome/campus-poster.jpg">
+        <video autoPlay muted loop playsInline>
           <source src="/welcome/campus-profile.mp4" type="video/mp4" />
         </video>
         <div className="video-overlay" aria-hidden="true" />
