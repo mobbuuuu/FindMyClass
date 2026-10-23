@@ -274,7 +274,7 @@ export default function FindMyClassApp() {
       />
 
       {/* Floating Top Navigation Header */}
-      <header className="top-nav-stack">
+      <header className={`top-nav-stack ${navigateTo ? "nav-active-hidden" : ""}`}>
         <nav className="liquid-menu" aria-label="Navigasi peta">
           <Brand />
           <span className="menu-divider" />
@@ -707,20 +707,6 @@ export default function FindMyClassApp() {
             Tutup
           </button>
         </section>
-      )}
-
-      {navigateTo && (
-        <div className="search-toast" role="status">
-          <span>Navigasi aktif ke <strong>{navigateTo.name}</strong></span>
-          <button
-            type="button"
-            className="toast-exit-btn"
-            onClick={handleNavigationEnd}
-            aria-label="Batalkan navigasi"
-          >
-            Akhiri ✕
-          </button>
-        </div>
       )}
 
       {shareCopied && (

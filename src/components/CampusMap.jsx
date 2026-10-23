@@ -351,15 +351,20 @@ function createUserMarker(L, position, popupText) {
   return L.marker(position, { icon, zIndexOffset: 1000 }).bindPopup(`<strong>${popupText}</strong>`);
 }
 
-/** Create glowing destination marker */
+/** Create Google Maps-style red teardrop destination pin */
 function createDestinationMarker(L, position, title, subtitle) {
   const icon = L.divIcon({
-    className: "dest-location-pin",
-    html: `<div class="dest-pin-glow"></div><div class="dest-pin-dot"></div>`,
-    iconSize: [32, 32],
-    iconAnchor: [16, 16],
+    className: "",
+    html: `<svg style="display:block;filter:drop-shadow(0 3px 6px rgba(0,0,0,0.4))" viewBox="0 0 24 36" width="32" height="46" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 0C5.37 0 0 5.37 0 12C0 21 12 36 12 36C12 36 24 21 24 12C24 5.37 18.63 0 12 0Z" fill="#EA4335"/>
+      <path d="M12 2C6.48 2 2 6.48 2 12C2 19.5 10.2 31.8 12 34.2C13.8 31.8 22 19.5 22 12C22 6.48 17.52 2 12 2Z" fill="#D93025"/>
+      <circle cx="12" cy="12" r="5" fill="#FFFFFF"/>
+    </svg>`,
+    iconSize: [32, 46],
+    iconAnchor: [16, 46],
+    popupAnchor: [0, -46],
   });
-  return L.marker(position, { icon, zIndexOffset: 900 }).bindPopup(`<strong>${title}</strong><br/>${subtitle}`);
+  return L.marker(position, { icon, zIndexOffset: 950 }).bindPopup(`<strong>${title}</strong><br/>${subtitle}`);
 }
 
 const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, onSelectPlace, onUserLocationChange }, ref) {
@@ -608,45 +613,56 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
           const entryGate = navigateTo.gate || null;
           const routeResult = await buildMultimodalRoute(from, to, mode, findCampusRoute, entryGate);
 
-          const { coords: routeCoords, legs, parkingUsed, entryGateUsed } = routeResult;
+          let routeCoords = routeResult.coords;
+          const { legs, parkingUsed, entryGateUsed } = routeResult;
 
           // Fallback if no route coords
           if (!routeCoords || routeCoords.length < 2) {
             routeCoords = [from, to];
           }
 
-          // Draw each leg with different styling
-          if (legs && legs.length > 0) {
-            legs.forEach((leg, idx) => {
-              const isDrive = leg.mode === "drive";
-              const isLast = idx === legs.length - 1;
-              const polyline = L.polyline(leg.coords, {
-                color: isDrive ? "#3b82f6" : "#c45030",
-                weight: 5,
-                opacity: 0.9,
-                dashArray: isDrive ? undefined : "10 8",
-                lineCap: "round",
-                className: "animated-route-line",
-              }).addTo(map.current);
-              // Store for cleanup - we'll use routeLine for the first leg, create refs for others
-              if (idx === 0) {
-                routeLine.current = polyline;
-              } else {
-                // Store additional polylines on routeLine as array
-                if (!routeLine.current._extraLegs) routeLine.current._extraLegs = [];
-                routeLine.current._extraLegs.push(polyline);
-              }
-            });
-          } else {
-            // Single polyline fallback
-            routeLine.current = L.polyline(routeCoords, {
-              color: mode === "motor" || mode === "car" ? "#255d6e" : "#c45030",
-              weight: 5,
-              opacity: 0.9,
-              dashArray: "10 8",
+          // Draw Google Maps-style dual-layer route (casing + core)
+          const allCreatedLines = [];
+
+          const drawGmapsLeg = (coords, isDrive, isBeam) => {
+            // Core color based on transport mode
+            const coreColor = isDrive ? "#1a73e8" : isBeam ? "#0284c7" : "#1a73e8";
+            const casingColor = "#ffffff";
+
+            // 1. Outer casing layer (gives Google Maps distinctive crisp border)
+            const casing = L.polyline(coords, {
+              color: casingColor,
+              weight: 9,
+              opacity: 0.95,
               lineCap: "round",
+              lineJoin: "round",
+            }).addTo(map.current);
+            allCreatedLines.push(casing);
+
+            // 2. Core path layer
+            const core = L.polyline(coords, {
+              color: coreColor,
+              weight: 5,
+              opacity: 1,
+              dashArray: isDrive ? undefined : "12 10",
+              lineCap: "round",
+              lineJoin: "round",
               className: "animated-route-line",
             }).addTo(map.current);
+            allCreatedLines.push(core);
+          };
+
+          if (legs && legs.length > 0) {
+            legs.forEach((leg) => {
+              drawGmapsLeg(leg.coords, leg.mode === "drive", mode === "beam");
+            });
+          } else {
+            drawGmapsLeg(routeCoords, mode === "motor" || mode === "car", mode === "beam");
+          }
+
+          if (allCreatedLines.length > 0) {
+            routeLine.current = allCreatedLines[0];
+            routeLine.current._extraLegs = allCreatedLines.slice(1);
           }
 
           // User location marker with radar pulse
@@ -661,7 +677,7 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
               iconSize: [28, 28],
               iconAnchor: [14, 14],
             });
-            if (!gateMarker) gateMarker = { current: null };
+            gateMarker.current?.remove();
             gateMarker.current = L.marker(entryGateUsed.position, { icon: gIcon, zIndexOffset: 960 })
               .addTo(map.current)
               .bindPopup(`<strong>${entryGateUsed.name}</strong><br/>Gerbang masuk kendaraan.`);
@@ -683,18 +699,6 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
           // Destination marker with animated glow
           destMarker.current = createDestinationMarker(L, to, navigateTo.name, "Tujuanmu").addTo(map.current);
 
-          // Bounce animation on destination marker after route renders
-          setTimeout(() => {
-            if (destMarker.current && destMarker.current._icon) {
-              const iconEl = destMarker.current._icon;
-              iconEl.style.transition = 'transform 400ms cubic-bezier(0.23, 1, 0.32, 1)';
-              iconEl.style.transform = 'scale(1.2)';
-              setTimeout(() => {
-                if (iconEl && iconEl.style) iconEl.style.transform = 'scale(1)';
-              }, 400);
-            }
-          }, 600);
-
           // Fit view to entire route with comfortable padding
           const bounds = L.latLngBounds(routeCoords);
           map.current.fitBounds(bounds, { padding: [60, 60], maxZoom: 18 });
@@ -713,11 +717,25 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
           if (entryGateUsed) parts.push(`Gerbang: ${entryGateUsed.name}`);
           if (parkingUsed) parts.push(`Parkir: ${parkingUsed.name}`);
           parts.push("Jalan kaki ke tujuan");
+
+          // Calculate estimated arrival time (ETA)
+          const walkMinutes = Math.max(1, Math.round(totalDist / 75));
+          const arrivalDate = new Date(Date.now() + walkMinutes * 60000);
+          const etaText = arrivalDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+          // Determine turn icon / instruction from initial bearing
+          const stepDist = Math.round(map.current.distance(L.latLng(from), L.latLng(nextStep)));
+
           setNavInfo({
             distance: totalDist < 1000 ? `${Math.round(totalDist)} m` : `${(totalDist / 1000).toFixed(1)} km`,
             walkTime: formatWalkTime(totalDist),
+            minutes: walkMinutes,
+            eta: etaText,
             bearing: Math.round(bearing),
-            destName: parts.join(" → "),
+            stepDist: stepDist < 1000 ? `${stepDist} m` : `${(stepDist / 1000).toFixed(1)} km`,
+            destName: navigateTo.name,
+            routeSummary: parts.join(" → "),
+            mode: navigateTo.mode || "walk",
           });
           setLocationMessage("");
         },
@@ -809,14 +827,44 @@ const CampusMap = forwardRef(function CampusMap({ navigateTo, onNavigationEnd, o
         </button>
       </div>
       {navInfo && (
-        <div className="nav-info-bar" role="status">
-          <span className="nav-arrow" style={{ transform: `rotate(${navInfo.bearing}deg)` }}>↑</span>
-          <div>
-            <strong>{navInfo.destName}</strong>
-            <span>{navInfo.distance} · {navInfo.walkTime}</span>
+        <>
+          {/* Google Maps Turn-by-turn Top Instruction Banner */}
+          <div className="gmaps-nav-banner" role="status">
+            <div className="gmaps-turn-icon" style={{ transform: `rotate(${navInfo.bearing}deg)` }}>
+              ↑
+            </div>
+            <div className="gmaps-turn-details">
+              <span className="gmaps-turn-dist">Dalam {navInfo.stepDist}</span>
+              <strong className="gmaps-turn-instruction">Lurus ke arah {navInfo.destName}</strong>
+            </div>
           </div>
-          <button type="button" className="nav-cancel" onClick={() => { clearRoute(); onNavigationEnd?.(); }} aria-label="Batalkan navigasi">✕</button>
-        </div>
+
+          {/* Google Maps Bottom ETA & Trip Summary Bar */}
+          <div className="gmaps-nav-bottom-bar" role="status">
+            <div className="gmaps-eta-left">
+              <div className="gmaps-duration-badge">
+                <span className="gmaps-time-val">{navInfo.minutes}</span>
+                <span className="gmaps-time-unit">mnt</span>
+              </div>
+              <div className="gmaps-trip-sub">
+                <span className="gmaps-dist-val">{navInfo.distance}</span>
+                <span className="gmaps-dot-sep">·</span>
+                <span className="gmaps-eta-time">Tiba {navInfo.eta}</span>
+              </div>
+            </div>
+            <div className="gmaps-eta-right">
+              <button
+                type="button"
+                className="gmaps-exit-btn"
+                onClick={() => { clearRoute(); onNavigationEnd?.(); }}
+                aria-label="Batalkan navigasi"
+                title="Keluar dari navigasi"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        </>
       )}
       {locationMessage && <p className="map-status" role="status">{locationMessage}</p>}
     </div>
