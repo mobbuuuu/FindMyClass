@@ -573,7 +573,10 @@ export default function FindMyClassApp() {
             <div>
               <span className="place-kind-badge">Gerbang Masuk</span>
               <h3 className="place-name">Pilih Gerbang Masuk Kampus</h3>
-              <p className="place-address">Moda: <strong>{selectedTransportMode === "motor" ? "Motor Pribadi" : "Mobil Pribadi"}</strong> → Parkir di Sport Center</p>
+              <p className="place-address">
+                Moda: <strong>{selectedTransportMode === "motor" ? "Motor Pribadi" : "Mobil Pribadi"}</strong>
+                {selectedTransportMode === "car" ? " (Hanya Gate 2 & Gate 3)" : ""} → Parkir di Sport Center
+              </p>
             </div>
             <button
               type="button"
@@ -585,20 +588,28 @@ export default function FindMyClassApp() {
             </button>
           </div>
           <div className="transport-options-list">
-            {CAMPUS_PLACES.filter((p) => p.kind === "Gate").map((gate) => (
-              <button
-                key={gate.name}
-                type="button"
-                className="transport-option-btn"
-                onClick={() => handleSelectGate(gate)}
-              >
-                <span className="transport-icon">🚪</span>
-                <div className="transport-info">
-                  <strong>{gate.name}</strong>
-                  <span>Masuk via {gate.name}</span>
-                </div>
-              </button>
-            ))}
+            {CAMPUS_PLACES
+              .filter((p) => {
+                if (p.kind !== "Gate") return false;
+                if (selectedTransportMode === "car") {
+                  return p.name === "Gate 2" || p.name === "Gate 3";
+                }
+                return true;
+              })
+              .map((gate) => (
+                <button
+                  key={gate.name}
+                  type="button"
+                  className="transport-option-btn"
+                  onClick={() => handleSelectGate(gate)}
+                >
+                  <span className="transport-icon">🚪</span>
+                  <div className="transport-info">
+                    <strong>{gate.name}</strong>
+                    <span>{selectedTransportMode === "car" ? `Akses mobil via ${gate.name}` : `Masuk via ${gate.name}`}</span>
+                  </div>
+                </button>
+              ))}
           </div>
         </section>
       )}
