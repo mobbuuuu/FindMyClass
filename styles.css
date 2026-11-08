@@ -10,8 +10,7 @@
   --line: #dce2df;
   --shadow: 0 16px 40px rgba(43, 65, 73, 0.1);
 
-  /* Apple-inspired timing tokens */
-  --ease-apple: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-apple: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --spring-snappy: cubic-bezier(0.23, 1.0, 0.32, 1);
   --duration-micro: 120ms;
@@ -132,10 +131,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
 }
 .map-status { position: absolute; z-index: 500; right: 18px; bottom: 18px; max-width: 240px; margin: 0; padding: 8px 12px; border-radius: 8px; color: var(--ink); background: rgba(255, 254, 250, .95); font-size: 11px; box-shadow: 0 4px 12px rgba(43, 65, 73, .12); }
 
-/* ============================================
-   WELCOME PANEL — single splash, transparent video bg, middle‑left text
-   ============================================ */
-
 .welcome-panel {
   position: fixed;
   inset: 0;
@@ -189,7 +184,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   }
 }
 
-/* Video background container with solid base to hide map behind welcome panel */
 .welcome-video-bg {
   position: fixed;
   inset: 0;
@@ -229,7 +223,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   background: linear-gradient(180deg, rgba(10,22,40,0.96) 0%, rgba(10,22,40,0.75) 100%);
 }
 
-/* Layer 1: Hero — fixed center-left, fades out on scroll */
 .welcome-hero-layer {
   position: fixed;
   top: 46%;
@@ -249,14 +242,12 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   pointer-events: none;
 }
 
-/* Spacer — one full viewport before Layer 2 appears */
 .welcome-scroll-spacer {
   height: 100vh;
   height: 100dvh;
   pointer-events: none;
 }
 
-/* Layer 2: Committers — in scroll flow, fades in */
 .committers-layer {
   position: relative;
   z-index: 30;
@@ -291,7 +282,7 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   font-weight: 700;
   line-height: 1.08;
   letter-spacing: -1px;
-  min-height: 2.2em; /* prevent layout shift while typing */
+  min-height: 2.2em;
 }
 
 .welcome-title .cursor {
@@ -432,7 +423,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   .committer-card { padding:20px 16px; }
 }
 
-/* Keep browser zoom at 100% while giving the desktop composition more room. */
 @media (min-width: 769px) {
   .welcome-panel,
   .map-app {
@@ -441,7 +431,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
 
 }
 
-/* Full-screen map workspace with a liquid‑glass command capsule. */
 .map-app { position: fixed; inset: 0; width: 100%; height: 100vh; height: 100dvh; overflow: hidden; background: #d8edea; overscroll-behavior: contain; }
 .map-app > .campus-map-shell { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; min-height: 0; border-radius: 0; box-shadow: none; }
 .map-app > .campus-map-shell .campus-map,
@@ -456,7 +445,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   }
 }
 
-/* Map blur-out / zoom-in transition when entering from welcome */
 .map-app.map-entering {
   filter: blur(14px);
   transform: scale(1.1);
@@ -479,7 +467,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   }
 }
 
-/* Floating Top Navigation Stack */
 .top-nav-stack {
   position: absolute;
   z-index: 550;
@@ -560,7 +547,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   transition: transform var(--duration-micro) var(--ease-apple);
 }
 
-/* Category chips and places strip */
 .category-chips-bar {
   display: flex;
   align-items: center;
@@ -759,7 +745,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   outline-offset: 2px;
 }
 
-/* Custom Leaflet tooltips for campus place labels */
 .campus-tooltip {
   background: rgba(255, 255, 255, 0.94) !important;
   border: 1px solid rgba(75, 143, 164, 0.35) !important;
@@ -774,7 +759,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
 }
 .campus-tooltip::before { display: none !important; }
 
-/* Search results dropdown panel */
 .search-results-dropdown {
   position: absolute;
   z-index: 600;
@@ -794,7 +778,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   animation: dropdownPopUp 0.25s var(--ease-out-expo) forwards;
 }
 
-/* Stagger delay for search result items via inline style --index */
 .search-result-item:nth-child(1) { animation-delay: 0ms; }
 .search-result-item:nth-child(2) { animation-delay: 40ms; }
 .search-result-item:nth-child(3) { animation-delay: 80ms; }
@@ -869,7 +852,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   font-size: 13px;
 }
 
-/* Interactive Place Preview Card */
 .place-preview-card {
   position: absolute;
   z-index: 600;
@@ -906,7 +888,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   }
 }
 
-/* Exit animations - reverse of entrance */
 @keyframes placeCardSlideDown {
   0% {
     opacity: 1;
@@ -1161,8 +1142,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   pointer-events: none;
 }
 
-/* Navigation info bar */
-/* Google Maps Style Destination Pin — className is empty string to avoid leaflet-div-icon defaults */
 
 @keyframes gmapsPinDrop {
   0% {
@@ -1179,7 +1158,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   }
 }
 
-/* Google Maps Top Turn-by-Turn Navigation Banner */
 .gmaps-nav-banner {
   position: absolute;
   z-index: 650;
@@ -1249,7 +1227,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   text-overflow: ellipsis;
 }
 
-/* Google Maps Bottom ETA & Trip Summary Bar */
 .gmaps-nav-bottom-bar {
   position: absolute;
   z-index: 650;
@@ -1357,7 +1334,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   transform: scale(0.92);
 }
 
-/* Animated Leaflet Route Polyline (SVG dash flow) */
 .animated-route-line {
   stroke-dashoffset: 0;
   animation: routeDashFlow 1.3s linear infinite !important;
@@ -1369,7 +1345,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   }
 }
 
-/* Custom Leaflet DivIcon Pin Overrides */
 .user-location-pin,
 .dest-location-pin,
 .heading-arrow {
@@ -1381,7 +1356,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   position: relative;
 }
 
-/* User Location Pin: Radar Pulse */
 .user-pin-dot {
   position: absolute;
   width: 14px;
@@ -1444,7 +1418,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   }
 }
 
-/* Destination Pin: Stable beacon with pulse ring */
 .dest-pin-dot {
   position: absolute;
   width: 16px;
@@ -1481,7 +1454,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   }
 }
 
-/* UI Entrance Keyframe Animations */
 @keyframes overlayFadeIn {
   from {
     opacity: 0;
@@ -1545,7 +1517,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   }
 }
 
-/* Staggered list reveal for search results, transport options, category places */
 @keyframes staggerContainer {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -1562,13 +1533,11 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   }
 }
 
-/* Shimmer skeleton for loading states */
 @keyframes shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
 
-/* Reduced motion accessibility guard */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -1580,7 +1549,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   }
 }
 
-/* Transport Mode Picker Modal */
 .transport-modal-card {
   position: absolute;
   z-index: 650;
@@ -1616,7 +1584,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   gap: 8px;
 }
 
-/* Stagger delays for transport option buttons */
 .transport-option-btn:nth-child(1) { animation: staggerChild 0.3s var(--ease-apple) backwards; animation-delay: 0ms; }
 .transport-option-btn:nth-child(2) { animation: staggerChild 0.3s var(--ease-apple) backwards; animation-delay: 60ms; }
 .transport-option-btn:nth-child(3) { animation: staggerChild 0.3s var(--ease-apple) backwards; animation-delay: 120ms; }
@@ -1680,7 +1647,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   color: var(--muted);
 }
 
-/* Saved Places Panel */
 .saved-places-panel {
   position: absolute;
   z-index: 600;
@@ -1779,7 +1745,6 @@ h1 em { color: var(--deep-blue); font-style: normal; }
   transition: transform var(--duration-micro) var(--ease-apple);
 }
 
-/* Profile Card Popover */
 .profile-card-popover {
   position: absolute;
   z-index: 600;

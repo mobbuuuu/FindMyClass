@@ -22,7 +22,6 @@ function Brand() {
 
 import WelcomePanel from "./WelcomePanel.jsx";
 
-/** Read recent places from localStorage */
 function loadRecentPlaces() {
   try {
     const raw = localStorage.getItem("telyu_recent_places");
@@ -32,7 +31,6 @@ function loadRecentPlaces() {
   } catch { return []; }
 }
 
-/** Save recent places to localStorage (store names only) */
 function saveRecentPlaces(places) {
   try {
     localStorage.setItem("telyu_recent_places", JSON.stringify(places.map((p) => p.name)));
@@ -66,13 +64,11 @@ export default function FindMyClassApp() {
   const [recentPlaces, setRecentPlaces] = useState([]);
   const [shareCopied, setShareCopied] = useState(false);
 
-  // Load recent places from localStorage on mount
-  useEffect(() => {
+    useEffect(() => {
     setRecentPlaces(loadRecentPlaces());
   }, []);
 
-  // URL deep linking: ?place=PlaceName
-  useEffect(() => {
+    useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const placeName = params.get("place");
     if (placeName) {
@@ -81,8 +77,7 @@ export default function FindMyClassApp() {
         (p) => p.name === decoded || p.aliases?.some((a) => a.toLowerCase() === decoded.toLowerCase()),
       );
       if (match) {
-        // Delay to let map mount
-        setTimeout(() => {
+                setTimeout(() => {
           setSelectedPlace(match);
           setShowWelcome(false);
           mapRef.current?.panToPlace(match);
@@ -104,8 +99,7 @@ export default function FindMyClassApp() {
         p.kind.toLowerCase().includes(q) ||
         p.aliases?.some((a) => a.toLowerCase().includes(q)),
     );
-    // Sort by distance if user location available
-    if (userLocation) {
+        if (userLocation) {
       results.sort((a, b) => getHaversineDistance(userLocation, a.position) - getHaversineDistance(userLocation, b.position));
     }
     return results;
@@ -130,8 +124,7 @@ export default function FindMyClassApp() {
     }, 220);
   }
 
-  // Keyboard navigation: Escape clears search or active modal
-  useEffect(() => {
+    useEffect(() => {
     function handleKeyDown(event) {
       if (event.key === "Escape") {
         if (query) {
@@ -163,8 +156,7 @@ export default function FindMyClassApp() {
   function handleSelectPlace(place) {
     setSelectedPlace(place);
     mapRef.current?.panToPlace(place);
-    // Update recent places
-    setRecentPlaces((prev) => {
+        setRecentPlaces((prev) => {
       const filtered = prev.filter((p) => p.name !== place.name);
       const updated = [place, ...filtered].slice(0, 5);
       saveRecentPlaces(updated);
@@ -173,15 +165,13 @@ export default function FindMyClassApp() {
   }
 
   function handleNavigate(place, mode = "walk") {
-    // For motor/car, show gate picker first
-    if (mode === "motor" || mode === "car") {
+        if (mode === "motor" || mode === "car") {
       setSelectedTransportMode(mode);
       setShowTransportModal(false);
       setShowGatePicker(true);
       return;
     }
-    // For walk/beam, navigate directly
-    setNavigateTo({ ...place, mode });
+        setNavigateTo({ ...place, mode });
     setSelectedPlace(null);
     setShowTransportModal(false);
     setQuery("");
@@ -206,8 +196,7 @@ export default function FindMyClassApp() {
     mapRef.current?.clearRoute();
   }
 
-  // Animated close handlers with exit transitions
-  function closeProfile() {
+    function closeProfile() {
     setShowProfileExiting(true);
     setTimeout(() => {
       setShowProfile(false);

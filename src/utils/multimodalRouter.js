@@ -1,16 +1,11 @@
-/**
- * Multimodal Routing helper for FindMyClass Telkom University
- * Supports Walking, Motor Pribadi, Mobil Pribadi, and BEAM e-motorcycle.
- */
-
 export const PARKING_LOCATIONS = {
   motor: {
     name: "Parkiran Motor (Sport Center)",
-    position: [-6.9716666667, 107.6295555556], // 6°58'18.0"S 107°37'48.2"E
+    position: [-6.9716666667, 107.6295555556],
   },
   car: {
     name: "Parkiran Mobil (Sport Center)",
-    position: [-6.9722222222, 107.6295555556], // 6°58'20.0"S 107°37'46.4"E
+    position: [-6.9722222222, 107.6295555556],
   }
 };
 
@@ -22,10 +17,6 @@ export const GATE_LOCATIONS = {
   "Gate 5": { name: "Gate 5", position: [-6.975225, 107.628982] },
 };
 
-/**
- * Fetch route from OSRM (driving profile).
- * Returns array of [lat, lng] coordinates or null on failure.
- */
 export async function fetchOSRMRoute(from, to) {
   try {
     const url = `https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${to[1]},${to[0]}?overview=full&geometries=geojson&alternatives=false`;
@@ -40,28 +31,7 @@ export async function fetchOSRMRoute(from, to) {
   return null;
 }
 
-/**
- * Calculates multimodal route based on transport mode and optional entry gate.
- *
- * Modes:
- * - 'walk': campus walkway only (findCampusRouteFn)
- * - 'beam': campus walkway only (findCampusRouteFn) - special rules handled elsewhere
- * - 'motor' / 'car': 3 legs using OSRM driving for vehicle segments:
- *   1. user GPS -> chosen gate (OSRM driving)
- *   2. gate -> parking (OSRM driving)
- *   3. parking -> destination (campus walkway via findCampusRouteFn)
- *
- * If no gate provided for motor/car: falls back to direct campus route to parking.
- *
- * @param {Array} from - [lat, lng] user position
- * @param {Array} to - [lat, lng] destination
- * @param {String} transportMode - 'walk' | 'motor' | 'car' | 'beam'
- * @param {Function} findCampusRouteFn - campus walkway pathfinder
- * @param {Object|null} entryGate - { name, position } or null
- * @returns {Promise<Object>} { coords, legs, parkingUsed, entryGateUsed }
- */
 export async function buildMultimodalRoute(from, to, transportMode, findCampusRouteFn, entryGate = null) {
-  // Walk or BEAM: direct campus walkway route
   if (transportMode === "walk" || transportMode === "beam") {
     const coords = findCampusRouteFn(from, to);
     return {
@@ -72,7 +42,6 @@ export async function buildMultimodalRoute(from, to, transportMode, findCampusRo
     };
   }
 
-  // Motor / Car: 3-leg multimodal route
   const parking = PARKING_LOCATIONS[transportMode];
   if (!parking) {
     const coords = findCampusRouteFn(from, to);
@@ -84,7 +53,6 @@ export async function buildMultimodalRoute(from, to, transportMode, findCampusRo
     };
   }
 
-  // If no gate selected, route directly to parking via campus walkway (fallback)
   if (!entryGate || !entryGate.position) {
     const leg1 = findCampusRouteFn(from, parking.position);
     const leg2 = findCampusRouteFn(parking.position, to);
@@ -102,7 +70,6 @@ export async function buildMultimodalRoute(from, to, transportMode, findCampusRo
     }
   }
 
-  // 3-leg route: user -> gate (OSRM) -> parking (OSRM) -> destination (walk)
   try {
     const [leg1Coords, leg2Coords] = await Promise.all([
       fetchOSRMRoute(from, entryGate.position),
@@ -118,7 +85,6 @@ export async function buildMultimodalRoute(from, to, transportMode, findCampusRo
       legs.push({ mode: "drive", from, to: entryGate.position, coords: leg1Coords });
       allCoords = [...leg1Coords];
     } else {
-      // Fallback: campus route user -> gate
       const fallback = findCampusRouteFn(from, entryGate.position);
       if (fallback && fallback.length >= 2) {
         legs.push({ mode: "drive", from, to: entryGate.position, coords: fallback });
@@ -152,7 +118,6 @@ export async function buildMultimodalRoute(from, to, transportMode, findCampusRo
     };
   } catch (e) {
     console.warn("Multimodal route failed:", e);
-    // Ultimate fallback: direct campus route
     const coords = findCampusRouteFn(from, to);
     return {
       coords: coords || [from, to],
